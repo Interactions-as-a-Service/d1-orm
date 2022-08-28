@@ -17,7 +17,9 @@ export class D1Orm {
 		return this.database.prepare(query);
 	}
 
-	async batch<T = unknown>(statements: D1PreparedStatement[]): Promise<D1Result<T>[]> {
+	async batch<T = unknown>(
+		statements: D1PreparedStatement[]
+	): Promise<D1Result<T>[]> {
 		return this.database.batch<T>(statements);
 	}
 }
