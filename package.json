@@ -1,0 +1,106 @@
+{
+	"name": "@skye31/d1-orm",
+	"version": "0.0.0",
+	"description": "A simple strictly typed ORM for Cloudflare's D1 product",
+	"keywords": [
+		"orm",
+		"cloudflare",
+		"d1",
+		"sqlite",
+		"typescript",
+		"workers"
+	],
+	"homepage": "https://github.com/Interactions-as-a-Service/d1-orm#readme",
+	"bugs": {
+		"url": "https://github.com/Interactions-as-a-Service/d1-orm/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Interactions-as-a-Service/d1-orm.git"
+	},
+	"license": "ISC",
+	"author": "Skye-31",
+	"main": "lib/index.js",
+	"files": [
+		"lib",
+		"src"
+	],
+	"scripts": {
+		"check:format": "prettier . --check --ignore-unknown",
+		"prettify": "prettier . --write --ignore-unknown",
+		"prepublish": "tsc",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"eslintConfig": {
+		"parser": "@typescript-eslint/parser",
+		"parserOptions": {
+			"ecmaVersion": 2020,
+			"project": "tsconfig.json",
+			"sourceType": "module"
+		},
+		"plugins": [
+			"@typescript-eslint",
+			"import",
+			"unused-imports"
+		],
+		"overrides": [
+			{
+				"files": [
+					"*.ts"
+				],
+				"extends": [
+					"eslint:recommended",
+					"plugin:@typescript-eslint/recommended",
+					"plugin:import/typescript"
+				],
+				"rules": {
+					"no-mixed-spaces-and-tabs": [
+						"error",
+						"smart-tabs"
+					],
+					"@typescript-eslint/consistent-type-imports:": "error",
+					"@typescript-eslint/no-explicit-any": "error",
+					"@typescript-eslint/no-unused-vars": "off",
+					"import/order": [
+						"warn",
+						{
+							"groups": [
+								"builtin",
+								"external",
+								"internal",
+								"parent",
+								"sibling",
+								"index",
+								"object",
+								"type"
+							],
+							"alphabetize": {
+								"order": "asc"
+							}
+						}
+					],
+					"unused-imports/no-unused-imports": "error",
+					"unused-imports/no-unused-vars": [
+						"warn",
+						{
+							"vars": "all",
+							"varsIgnorePattern": "^_",
+							"args": "after-used",
+							"argsIgnorePattern": "^_"
+						}
+					]
+				}
+			}
+		],
+		"ignorePatterns": [
+			"lib",
+			"node_modules"
+		],
+		"root": true
+	},
+	"devDependencies": {
+		"prettier": "^2.7.1",
+		"prettier-plugin-packagejson": "^2.2.18",
+		"typescript": "^4.8.2"
+	}
+}
