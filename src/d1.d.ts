@@ -17,7 +17,7 @@ declare abstract class D1Database {
 }
 
 declare abstract class D1PreparedStatement {
-	bind(...values: any[]): D1PreparedStatement;
+	bind(...values: unknown[]): D1PreparedStatement;
 	first<T = unknown>(colName?: string): Promise<T>;
 	run<T = unknown>(): Promise<D1Result<T>>;
 	all<T = unknown>(): Promise<D1Result<T[]>>;

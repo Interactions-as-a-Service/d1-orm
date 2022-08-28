@@ -27,6 +27,7 @@
 	],
 	"scripts": {
 		"check:format": "prettier . --check --ignore-unknown",
+		"check:lint": "eslint src/*.ts --cache --cache-strategy content --max-warnings=0",
 		"prettify": "prettier . --write --ignore-unknown",
 		"prepublish": "tsc",
 		"test": "echo \"Error: no test specified\" && exit 1"
@@ -58,7 +59,7 @@
 						"error",
 						"smart-tabs"
 					],
-					"@typescript-eslint/consistent-type-imports:": "error",
+					"@typescript-eslint/consistent-type-imports": "error",
 					"@typescript-eslint/no-explicit-any": "error",
 					"@typescript-eslint/no-unused-vars": "off",
 					"import/order": [
@@ -99,6 +100,9 @@
 		"root": true
 	},
 	"devDependencies": {
+		"@typescript-eslint/eslint-plugin": "^5.35.1",
+		"eslint-plugin-import": "^2.26.0",
+		"eslint-plugin-unused-imports": "^2.0.0",
 		"prettier": "^2.7.1",
 		"prettier-plugin-packagejson": "^2.2.18",
 		"typescript": "^4.8.2"

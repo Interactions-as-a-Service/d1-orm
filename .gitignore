@@ -11,3 +11,6 @@ lib
 
 # Output from npm pack
 *.tgz
+
+# Eslint Cache
+.eslintcache
