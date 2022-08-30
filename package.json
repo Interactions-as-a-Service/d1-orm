@@ -1,7 +1,7 @@
 {
 	"name": "d1-orm",
-	"private": false,
 	"version": "0.0.1",
+	"private": false,
 	"description": "A simple strictly typed ORM for Cloudflare's D1 product",
 	"keywords": [
 		"orm",
