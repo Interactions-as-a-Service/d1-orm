@@ -1,23 +1,25 @@
 export class D1Orm implements D1Database {
-	database: D1Database;
-
 	constructor(database: D1Database) {
 		this.database = database;
 	}
 
-	async exec<T>(query: string): Promise<D1Result<T>> {
-		return this.database.exec<T>(query);
-	}
+	private readonly database: D1Database;
 
-	async dump(): Promise<ArrayBuffer> {
-		return this.database.dump();
-	}
-
-	prepare(query: string): D1PreparedStatement {
+	public prepare(query: string): D1PreparedStatement {
 		return this.database.prepare(query);
 	}
 
-	async batch<T>(statements: D1PreparedStatement[]): Promise<D1Result<T>[]> {
+	public async dump(): Promise<ArrayBuffer> {
+		return this.database.dump();
+	}
+
+	public async batch<T>(
+		statements: D1PreparedStatement[]
+	): Promise<D1Result<T>[]> {
 		return this.database.batch<T>(statements);
+	}
+
+	public async exec<T>(query: string): Promise<D1Result<T>> {
+		return this.database.exec<T>(query);
 	}
 }
