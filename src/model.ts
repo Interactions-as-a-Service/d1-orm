@@ -1,4 +1,5 @@
 import { D1Orm } from "./database";
+import type { DataTypes } from "./datatypes";
 
 export class Model {
 	constructor(options: ModelOptions, columns: ModelColumns) {
@@ -44,13 +45,6 @@ export type ModelColumn = {
 	autoIncrement?: boolean;
 	default?: unknown;
 };
-
-export enum DataTypes {
-	Integer = "integer",
-	String = "text",
-	Number = "real",
-	Blob = "blob",
-}
 
 export type ModelOptions = {
 	D1Orm: D1Orm;
