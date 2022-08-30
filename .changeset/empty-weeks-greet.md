@@ -1,5 +1,5 @@
 ---
-"d1-orm": patch
+"d1-orm": minor
 ---
 
 Feat: Start implementing models
