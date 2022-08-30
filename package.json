@@ -1,5 +1,5 @@
 {
-	"name": "@skye31/d1-orm",
+	"name": "d1-orm",
 	"version": "0.0.0",
 	"description": "A simple strictly typed ORM for Cloudflare's D1 product",
 	"keywords": [
