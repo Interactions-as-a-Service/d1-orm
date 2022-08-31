@@ -85,10 +85,7 @@ export class Model<T> {
 		query: string,
 		data: Record<string, unknown>
 	): D1PreparedStatement {
-		let statement = this.D1Orm.prepare(query);
-		for (const value of Object.values(data)) {
-			statement = statement.bind(value);
-		}
+		const statement = this.D1Orm.prepare(query).bind(...Object.values(data));
 		return statement;
 	}
 
@@ -156,6 +153,26 @@ export class Model<T> {
 			where
 		);
 		return stmt.all<T>();
+	}
+
+	public async Delete(options: {
+		where: WhereOptions<T>;
+		limit?: number;
+	}): Promise<D1Result<unknown>> {
+		const { where, limit } = options;
+		const objectKeys = Object.keys(where as Record<string, unknown>);
+		if (objectKeys.length === 0) {
+			return this.D1Orm.prepare(
+				`DELETE FROM ${this.tableName}${limit ? `LIMIT ${limit}` : ""};`
+			).run();
+		}
+		const stmt = this.statementAddBindings(
+			`DELETE FROM ${this.tableName} WHERE ` +
+				objectKeys.map((key) => `${key} = ?`).join(" AND ") +
+				(limit ? ` LIMIT ${limit}` : ""),
+			where
+		);
+		return stmt.run();
 	}
 }
 
