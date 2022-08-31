@@ -1,7 +1,7 @@
 import { D1Orm } from "./database";
-import type { DataTypes } from "./datatypes";
+import { DataTypes } from "./datatypes";
 
-export class Model {
+export class Model<T> {
 	constructor(options: ModelOptions, columns: ModelColumns) {
 		this.D1Orm = options.D1Orm;
 		this.tableName = options.tableName;
@@ -27,6 +27,11 @@ export class Model {
 					throw new Error(`Model has multiple primary keys`);
 				}
 				primaryKey = columnName;
+			}
+			if (column.autoIncrement && column.type !== DataTypes.INTEGER) {
+				throw new Error(
+					`Column ${columnName} is autoincrement but is not an integer`
+				);
 			}
 		}
 	}
@@ -74,6 +79,22 @@ export class Model {
 			return this.D1Orm.exec(`DROP TABLE IF EXISTS ${this.tableName};`);
 		}
 		return this.D1Orm.exec(`DROP TABLE ${this.tableName};`);
+	}
+
+	public async InsertOne(data: Partial<T>): Promise<D1Result<T>> {
+		const columnNames = Object.keys(data);
+		if (columnNames.length === 0) {
+			throw new Error("InsertOne called with no columns");
+		}
+		let stmt = this.D1Orm.prepare(
+			`INSERT INTO ${this.tableName} (${columnNames.join(
+				", "
+			)}) VALUES (${"?, ".repeat(columnNames.length - 1)}?) RETURNING *;`
+		);
+		for (const column of columnNames) {
+			stmt = stmt.bind((data as Record<string, unknown>)[column]);
+		}
+		return stmt.first<D1Result<T>>();
 	}
 }
 
