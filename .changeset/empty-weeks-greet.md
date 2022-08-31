@@ -12,7 +12,8 @@ The key goals for this PR are to support:
 - First()
 - All()
 - Update()
-- Insert()
+- InsertOne()
+- InsertMany()
 - Delete()
 - UpdateOrInsert (naming TBD, possibly upsert?)
 
