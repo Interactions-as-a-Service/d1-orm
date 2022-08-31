@@ -81,34 +81,81 @@ export class Model<T> {
 		return this.D1Orm.exec(`DROP TABLE ${this.tableName};`);
 	}
 
-	private createStatement(data: Partial<T>): D1PreparedStatement {
+	private statementAddBindings(
+		query: string,
+		data: Record<string, unknown>
+	): D1PreparedStatement {
+		let statement = this.D1Orm.prepare(query);
+		for (const value of Object.values(data)) {
+			statement = statement.bind(value);
+		}
+		return statement;
+	}
+
+	private createInsertStatement(data: Partial<T>): D1PreparedStatement {
 		const dataRecord = data as Record<string, unknown>;
 		const columnNames = Object.keys(dataRecord);
 		const columnSize = columnNames.length;
 		if (columnSize === 0) {
 			throw new Error("InsertOne called with no columns");
 		}
-		let stmt = this.D1Orm.prepare(
+		return this.statementAddBindings(
 			`INSERT INTO ${this.tableName} (${columnNames.join(
 				", "
-			)}) VALUES (${"?, ".repeat(columnSize - 1)}?) RETURNING *;`
+			)}) VALUES (${"?, ".repeat(columnSize - 1)}?) RETURNING *;`,
+			dataRecord
 		);
-		for (const column of columnNames) {
-			stmt = stmt.bind(dataRecord[column]);
-		}
-		return stmt;
 	}
 
 	public async InsertOne(data: Partial<T>): Promise<D1Result<T>> {
-		return this.createStatement(data).first<D1Result<T>>();
+		return this.createInsertStatement(data).first<D1Result<T>>();
 	}
 
 	public async InsertMany(data: Partial<T>[]): Promise<D1Result<T>[]> {
 		const stmts: D1PreparedStatement[] = [];
 		for (const row of data) {
-			stmts.push(this.createStatement(row));
+			stmts.push(this.createInsertStatement(row));
 		}
 		return this.D1Orm.batch<T>(stmts);
+	}
+
+	public async First(options: {
+		where: WhereOptions<T>;
+	}): Promise<D1Result<T>> {
+		const { where } = options;
+		const objectKeys = Object.keys(where as Record<string, unknown>);
+		if (objectKeys.length === 0) {
+			return this.D1Orm.prepare(
+				`SELECT * FROM ${this.tableName} LIMIT 1;`
+			).first<D1Result<T>>();
+		}
+		const stmt = this.statementAddBindings(
+			`SELECT * FROM ${this.tableName} WHERE ` +
+				objectKeys.map((key) => `${key} = ?`).join(" AND ") +
+				" LIMIT 1;",
+			where
+		);
+		return stmt.first<D1Result<T>>();
+	}
+
+	public async All(options: {
+		where: WhereOptions<T>;
+		limit?: number;
+	}): Promise<D1Result<T[]>> {
+		const { where, limit } = options;
+		const objectKeys = Object.keys(where as Record<string, unknown>);
+		if (objectKeys.length === 0) {
+			return this.D1Orm.prepare(
+				`SELECT * FROM ${this.tableName}${limit ? `LIMIT ${limit}` : ""};`
+			).all<T>();
+		}
+		const stmt = this.statementAddBindings(
+			`SELECT * FROM ${this.tableName} WHERE ` +
+				objectKeys.map((key) => `${key} = ?`).join(" AND ") +
+				(limit ? ` LIMIT ${limit}` : ""),
+			where
+		);
+		return stmt.all<T>();
 	}
 }
 
@@ -131,3 +178,5 @@ export type ModelOptions = {
 export type CreateTableOptions = {
 	strategy: "default" | "force" | "alter";
 };
+
+export type WhereOptions<T> = Partial<T>;
