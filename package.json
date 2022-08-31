@@ -21,6 +21,7 @@
 	},
 	"license": "ISC",
 	"author": "Skye-31",
+	"type": "module",
 	"main": "lib/index.js",
 	"files": [
 		"lib",
