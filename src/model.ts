@@ -33,6 +33,13 @@ export class Model {
 	public tableName: string;
 	public readonly columns: ModelColumns;
 	private readonly D1Orm: D1Orm;
+
+	public async DropTable(silent?: boolean): Promise<D1Result<unknown>> {
+		if (silent) {
+			return this.D1Orm.exec(`DROP TABLE IF EXISTS ${this.tableName};`);
+		}
+		return this.D1Orm.exec(`DROP TABLE ${this.tableName};`);
+	}
 }
 
 export type ModelColumns = Record<string, ModelColumn>;
