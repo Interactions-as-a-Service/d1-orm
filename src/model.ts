@@ -34,6 +34,41 @@ export class Model {
 	public readonly columns: ModelColumns;
 	private readonly D1Orm: D1Orm;
 
+	public async CreateTable(
+		{ strategy }: CreateTableOptions = { strategy: "default" }
+	): Promise<D1Result<unknown>> {
+		if (strategy === "alter") {
+			throw new Error("Alter strategy is not implemented");
+		}
+		const columnEntries = Object.entries(this.columns);
+		const columnDefinitions = columnEntries
+			.map(([columnName, column]) => {
+				let definition = `${columnName} ${column.type}`;
+				if (column.primaryKey) {
+					definition += " PRIMARY KEY";
+				}
+				if (column.autoIncrement) {
+					definition += " AUTOINCREMENT";
+				}
+				if (column.notNull) {
+					definition += " NOT NULL";
+				}
+				if (column.unique) {
+					definition += " UNIQUE";
+				}
+				if (column.defaultValue) {
+					definition += ` DEFAULT "${column.defaultValue}"`;
+				}
+				return definition;
+			})
+			.join(", ");
+		const statement = `CREATE TABLE ${this.tableName} (${columnDefinitions});`;
+		if (strategy === "force") {
+			await this.DropTable(true);
+		}
+		return this.D1Orm.exec(statement);
+	}
+
 	public async DropTable(silent?: boolean): Promise<D1Result<unknown>> {
 		if (silent) {
 			return this.D1Orm.exec(`DROP TABLE IF EXISTS ${this.tableName};`);
@@ -50,10 +85,14 @@ export type ModelColumn = {
 	notNull?: boolean;
 	unique?: boolean;
 	autoIncrement?: boolean;
-	default?: unknown;
+	defaultValue?: unknown;
 };
 
 export type ModelOptions = {
 	D1Orm: D1Orm;
 	tableName: string;
+};
+
+export type CreateTableOptions = {
+	strategy: "default" | "force" | "alter";
 };
