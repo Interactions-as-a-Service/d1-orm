@@ -81,20 +81,34 @@ export class Model<T> {
 		return this.D1Orm.exec(`DROP TABLE ${this.tableName};`);
 	}
 
-	public async InsertOne(data: Partial<T>): Promise<D1Result<T>> {
-		const columnNames = Object.keys(data);
-		if (columnNames.length === 0) {
+	private createStatement(data: Partial<T>): D1PreparedStatement {
+		const dataRecord = data as Record<string, unknown>;
+		const columnNames = Object.keys(dataRecord);
+		const columnSize = columnNames.length;
+		if (columnSize === 0) {
 			throw new Error("InsertOne called with no columns");
 		}
 		let stmt = this.D1Orm.prepare(
 			`INSERT INTO ${this.tableName} (${columnNames.join(
 				", "
-			)}) VALUES (${"?, ".repeat(columnNames.length - 1)}?) RETURNING *;`
+			)}) VALUES (${"?, ".repeat(columnSize - 1)}?) RETURNING *;`
 		);
 		for (const column of columnNames) {
-			stmt = stmt.bind((data as Record<string, unknown>)[column]);
+			stmt = stmt.bind(dataRecord[column]);
 		}
-		return stmt.first<D1Result<T>>();
+		return stmt;
+	}
+
+	public async InsertOne(data: Partial<T>): Promise<D1Result<T>> {
+		return this.createStatement(data).first<D1Result<T>>();
+	}
+
+	public async InsertMany(data: Partial<T>[]): Promise<D1Result<T>[]> {
+		const stmts: D1PreparedStatement[] = [];
+		for (const row of data) {
+			stmts.push(this.createStatement(row));
+		}
+		return this.D1Orm.batch<T>(stmts);
 	}
 }
 
