@@ -21,12 +21,14 @@
 	},
 	"license": "ISC",
 	"author": "Skye-31",
+	"type": "module",
 	"main": "lib/index.js",
 	"files": [
 		"lib",
 		"src"
 	],
 	"scripts": {
+		"build": "tsc",
 		"check:format": "prettier . --check --ignore-unknown --end-of-line lf",
 		"check:lint": "eslint src/*.ts --cache --cache-strategy content --max-warnings=0",
 		"prettify": "prettier . --write --ignore-unknown --end-of-line lf",
@@ -102,8 +104,8 @@
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.24.4",
-		"@cloudflare/workers-types": "^3.15.0",
-		"@typescript-eslint/eslint-plugin": "^5.35.1",
+		"@cloudflare/workers-types": "^3.16.0",
+		"@typescript-eslint/eslint-plugin": "^5.36.1",
 		"eslint-plugin-import": "^2.26.0",
 		"eslint-plugin-unused-imports": "^2.0.0",
 		"prettier": "^2.7.1",
