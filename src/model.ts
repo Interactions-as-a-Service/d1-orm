@@ -17,17 +17,11 @@ export class Model<T> {
 		if (!columnEntries.length) {
 			throw new Error("Model columns cannot be empty");
 		}
-		let primaryKey: string | undefined;
+
+		// This is done so the getter checks if the model has a primary key, and throws an error if not
+		this.#primaryKey;
+
 		for (const [columnName, column] of columnEntries) {
-			if (!column.type) {
-				throw new Error(`Column ${columnName} has no type`);
-			}
-			if (column.primaryKey) {
-				if (primaryKey) {
-					throw new Error(`Model has multiple primary keys`);
-				}
-				primaryKey = columnName;
-			}
 			if (column.autoIncrement && column.type !== DataTypes.INTEGER) {
 				throw new Error(
 					`Column ${columnName} is autoincrement but is not an integer`
@@ -79,29 +73,6 @@ export class Model<T> {
 			return this.#D1Orm.exec(`DROP TABLE IF EXISTS ${this.tableName};`);
 		}
 		return this.#D1Orm.exec(`DROP TABLE ${this.tableName};`);
-	}
-
-	#statementAddBindings(
-		query: string,
-		data: Record<string, unknown>
-	): D1PreparedStatement {
-		const statement = this.#D1Orm.prepare(query).bind(...Object.values(data));
-		return statement;
-	}
-
-	#createInsertStatement(data: Partial<T>): D1PreparedStatement {
-		const dataRecord = data as Record<string, unknown>;
-		const columnNames = Object.keys(dataRecord);
-		const columnSize = columnNames.length;
-		if (columnSize === 0) {
-			throw new Error("InsertOne called with no columns");
-		}
-		return this.#statementAddBindings(
-			`INSERT INTO ${this.tableName} (${columnNames.join(
-				", "
-			)}) VALUES (${"?, ".repeat(columnSize - 1)}?) RETURNING *;`,
-			dataRecord
-		);
 	}
 
 	public async InsertOne(data: Partial<T>): Promise<D1Result<T>> {
@@ -213,6 +184,39 @@ export class Model<T> {
 			params
 		);
 		return stmt.run();
+	}
+
+	get #primaryKey(): string {
+		const keys = Object.keys(this.columns).filter(
+			(key) => this.columns[key].primaryKey
+		);
+		if (keys.length !== 1) {
+			throw new Error(`Model should have 1 primary key, got: ${keys.length}`);
+		}
+		return keys[0];
+	}
+
+	#statementAddBindings(
+		query: string,
+		data: Record<string, unknown>
+	): D1PreparedStatement {
+		const statement = this.#D1Orm.prepare(query).bind(...Object.values(data));
+		return statement;
+	}
+
+	#createInsertStatement(data: Partial<T>): D1PreparedStatement {
+		const dataRecord = data as Record<string, unknown>;
+		const columnNames = Object.keys(dataRecord);
+		const columnSize = columnNames.length;
+		if (columnSize === 0) {
+			throw new Error("InsertOne called with no columns");
+		}
+		return this.#statementAddBindings(
+			`INSERT INTO ${this.tableName} (${columnNames.join(
+				", "
+			)}) VALUES (${"?, ".repeat(columnSize - 1)}?) RETURNING *;`,
+			dataRecord
+		);
 	}
 }
 
