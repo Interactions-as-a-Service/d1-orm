@@ -18,9 +18,6 @@ export class Model<T> {
 			throw new Error("Model columns cannot be empty");
 		}
 
-		// This is done so the getter checks if the model has a primary key, and throws an error if not
-		this.#primaryKey;
-
 		for (const [columnName, column] of columnEntries) {
 			if (column.autoIncrement && column.type !== DataTypes.INTEGER) {
 				throw new Error(
@@ -28,6 +25,9 @@ export class Model<T> {
 				);
 			}
 		}
+
+		// This is done so the getter checks if the model has a primary key, and throws an error if not
+		this.#primaryKey;
 	}
 	public tableName: string;
 	public readonly columns: ModelColumns;
@@ -61,9 +61,9 @@ export class Model<T> {
 				return definition;
 			})
 			.join(", ");
-		const statement = `CREATE TABLE ${this.tableName} (${columnDefinitions});`;
+		let statement = `CREATE TABLE ${this.tableName} (${columnDefinitions});`;
 		if (strategy === "force") {
-			await this.DropTable(true);
+			statement = `DROP TABLE IF EXISTS ${this.tableName}; ${statement}`;
 		}
 		return this.#D1Orm.exec(statement);
 	}
