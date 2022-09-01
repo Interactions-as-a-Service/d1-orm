@@ -63,7 +63,7 @@ export class Model<T> {
 			.join(", ");
 		let statement = `CREATE TABLE ${this.tableName} (${columnDefinitions});`;
 		if (strategy === "force") {
-			statement = `DROP TABLE IF EXISTS ${this.tableName}; ${statement}`;
+			statement = `DROP TABLE IF EXISTS ${this.tableName}\n${statement}`;
 		}
 		return this.#D1Orm.exec(statement);
 	}
@@ -115,12 +115,12 @@ export class Model<T> {
 		if (objectKeys.length === 0) {
 			return this.#D1Orm
 				.prepare(
-					`SELECT * FROM ${this.tableName}${limit ? `LIMIT ${limit}` : ""};`
+					`SELECT * FROM ${this.tableName}${limit ? ` LIMIT ${limit}` : ""};`
 				)
 				.all<T>();
 		}
 		const stmt = this.#statementAddBindings(
-			`SELECT * FROM ${this.tableName} WHERE ` +
+			`SELECT * FROM ${this.tableName} WHERE` +
 				objectKeys.map((key) => `${key} = ?`).join(" AND ") +
 				(limit ? ` LIMIT ${limit}` : ""),
 			where
@@ -184,6 +184,42 @@ export class Model<T> {
 			params
 		);
 		return stmt.run();
+	}
+
+	public async Upsert(options: {
+		where: WhereOptions<T>;
+		updateData: Partial<T>;
+		insertData: Partial<T>;
+	}) {
+		const { where, updateData, insertData } = options;
+		const insertDataKeys = Object.keys(insertData as Record<string, unknown>);
+		const updateDataKeys = Object.keys(updateData as Record<string, unknown>);
+		const whereKeys = Object.keys(where as Record<string, unknown>);
+
+		if (insertDataKeys.length === 0 || updateDataKeys.length === 0) {
+			throw new Error("Upsert called with no data");
+		}
+
+		const bindings = [
+			...Object.values(insertData),
+			...Object.values(updateData),
+			...Object.values(where),
+		];
+		const stmt = `INSERT INTO ${this.tableName} (${insertDataKeys.join(
+			", "
+		)}) VALUES (${insertDataKeys.map(() => "?").join(", ")})
+		ON CONFLICT (${this.#primaryKey}) DO UPDATE SET ${updateDataKeys
+			.map((key) => `${key} = ?`)
+			.join(", ")}
+			${
+				whereKeys.length
+					? `WHERE ${whereKeys.map((x) => `${x} = ?`).join(" AND ")}`
+					: ""
+			};`;
+		return this.#D1Orm
+			.prepare(stmt)
+			.bind(...bindings)
+			.run();
 	}
 
 	get #primaryKey(): string {

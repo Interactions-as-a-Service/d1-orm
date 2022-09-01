@@ -15,7 +15,7 @@ The key goals for this PR are to support:
 - InsertOne()
 - InsertMany()
 - Delete()
-- UpdateOrInsert (naming TBD, possibly upsert?)
+- Upsert()
 
 ```ts
 type User = {
