@@ -1,7 +1,14 @@
 import { D1Orm } from "./database";
 import { DataTypes } from "./datatypes";
 
+/**
+ * @typeParam T - The type of the model, which will be returned when using methods such as First() or All()
+ */
 export class Model<T> {
+	/**
+	 * @param options - The options for the model. The table name & D1Orm instance are required.
+	 * @typeParam T - The type of the model, which will be returned when using methods such as First() or All()
+	 */
 	constructor(options: ModelOptions, columns: ModelColumns) {
 		this.#D1Orm = options.D1Orm;
 		this.tableName = options.tableName;
@@ -33,6 +40,15 @@ export class Model<T> {
 	public readonly columns: ModelColumns;
 	readonly #D1Orm: D1Orm;
 
+	/**
+	 * @param options The options for creating the table. Currently only contains strategy, which is the strategy to use when creating the table.
+	 * - "default" - The default strategy, which will attempt create the table.
+	 * - "force" - Drops the table if it exists, then creates it
+	 * - "alter" - [NOT YET IMPLEMENTED] Attempts to alter the table to match the model
+	 * @throws
+	 * - Throws an error if the table already exists and the strategy is not "force".
+	 * - Throws an error if the strategy is "alter", as this is not yet implemented
+	 */
 	public async CreateTable(
 		options: CreateTableOptions = { strategy: "default" }
 	): Promise<D1Result<unknown>> {
@@ -69,6 +85,9 @@ export class Model<T> {
 		return this.#D1Orm.exec(statement);
 	}
 
+	/**
+	 * @param silent If true, will ignore the table not existing. If false, will throw an error if the table does not exist.
+	 */
 	public async DropTable(silent?: boolean): Promise<D1Result<unknown>> {
 		if (silent) {
 			return this.#D1Orm.exec(`DROP TABLE IF EXISTS ${this.tableName};`);
@@ -76,10 +95,16 @@ export class Model<T> {
 		return this.#D1Orm.exec(`DROP TABLE ${this.tableName};`);
 	}
 
+	/**
+	 * @param data The data to insert into the table, as an object with the column names as keys and the values as values.
+	 */
 	public async InsertOne(data: Partial<T>): Promise<D1Result<T>> {
 		return this.#createInsertStatement(data).first<D1Result<T>>();
 	}
 
+	/**
+	 * @param data The data to insert into the table, as an array of objects with the column names as keys and the values as values.
+	 */
 	public async InsertMany(data: Partial<T>[]): Promise<D1Result<T>[]> {
 		const stmts: D1PreparedStatement[] = [];
 		for (const row of data) {
@@ -88,6 +113,11 @@ export class Model<T> {
 		return this.#D1Orm.batch<T>(stmts);
 	}
 
+	/**
+	 * @param options The options for the query
+	 * @param options.where - The where clause for the query. This is an object with the column names as keys and the values as values.
+	 * @returns Returns the first row that matches the where clause.
+	 */
 	public async First(options: {
 		where: WhereOptions<T>;
 	}): Promise<D1Result<T>> {
@@ -107,6 +137,12 @@ export class Model<T> {
 		return stmt.first<D1Result<T>>();
 	}
 
+	/**
+	 * @param options The options for the query
+	 * @param options.where - The where clause for the query. This is an object with the column names as keys and the values as values.
+	 * @param options.limit - The limit for the query. This is the maximum number of rows to return.
+	 * @returns Returns all rows that match the where clause.
+	 */
 	public async All(options: {
 		where: WhereOptions<T>;
 		limit?: number;
@@ -129,6 +165,11 @@ export class Model<T> {
 		return stmt.all<T>();
 	}
 
+	/**
+	 * @param options The options for the query
+	 * @param options.where - The where clause for the query. This is an object with the column names as keys and the values as values.
+	 * @param options.limit - The limit for the query. This is the maximum number of rows to delete.
+	 */
 	public async Delete(options: {
 		where: WhereOptions<T>;
 		limit?: number;
@@ -151,6 +192,14 @@ export class Model<T> {
 		return stmt.run();
 	}
 
+	/**
+	 * @param options The options for the query
+	 * @param options.where - The where clause for the query. This is an object with the column names as keys and the values as values.
+	 * @param options.limit - The limit for the query. This is the maximum number of rows to update.
+	 * @param options.data - The data to update the rows with. This is an object with the column names as keys and the values as values.
+	 * @throws
+	 * - Throws an error if the data clause is empty.
+	 */
 	public async Update(options: {
 		where: WhereOptions<T>;
 		data: Partial<T>;
@@ -187,6 +236,17 @@ export class Model<T> {
 		return stmt.run();
 	}
 
+	/**
+	 * Upserting is a way to insert a row into the table, or update it if it already exists.
+	 * This is done by using SQLITE's ON CONFLICT clause. As a result, this method should control the primary key for the insert & where clauses, and should not be used with auto incrementing keys.
+	 * @param options The options for the query
+	 * @param options.where - The where clause for the query. This is an object with the column names as keys and the values as values.
+	 * @param options.limit - The limit for the query. This is the maximum number of rows to update.
+	 * @param options.updateData - The data to update the rows with if an `ON CONFLICT` clause occurs. This is an object with the column names as keys and the values as values.
+	 * @param options.insertData - The data to insert. This is an object with the column names as keys and the values as values.
+	 * @throws
+	 * - Throws an error if the data clause is empty.
+	 */
 	public async Upsert(options: {
 		where: WhereOptions<T>;
 		updateData: Partial<T>;
