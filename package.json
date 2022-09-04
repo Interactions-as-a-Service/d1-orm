@@ -31,6 +31,7 @@
 		"build": "tsc",
 		"check:format": "prettier . --check --ignore-unknown --end-of-line lf",
 		"check:lint": "eslint src/*.ts --cache --cache-strategy content --max-warnings=0",
+		"lint:fix": "eslint src/*.ts --fix",
 		"prettify": "prettier . --write --ignore-unknown --end-of-line lf",
 		"prepublish": "tsc",
 		"test": "echo \"Error: no test specified\" && exit 1"
@@ -58,6 +59,10 @@
 					"plugin:import/typescript"
 				],
 				"rules": {
+					"arrow-body-style": [
+						"error",
+						"as-needed"
+					],
 					"no-mixed-spaces-and-tabs": [
 						"error",
 						"smart-tabs"
