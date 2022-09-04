@@ -245,7 +245,7 @@ export class Model<T> {
 		const columnNames = Object.keys(dataRecord);
 		const columnSize = columnNames.length;
 		if (columnSize === 0) {
-			throw new Error("InsertOne called with no columns");
+			throw new Error("Insert called with no columns");
 		}
 		return this.#statementAddBindings(
 			`INSERT INTO ${this.tableName} (${columnNames.join(
