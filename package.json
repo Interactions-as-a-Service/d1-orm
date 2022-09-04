@@ -29,6 +29,7 @@
 	],
 	"scripts": {
 		"build": "tsc",
+		"build:docs": "rm -r docs && typedoc",
 		"check:format": "prettier . --check --ignore-unknown --end-of-line lf",
 		"check:lint": "eslint src/*.ts --cache --cache-strategy content --max-warnings=0",
 		"lint:fix": "eslint src/*.ts --fix",
@@ -115,6 +116,7 @@
 		"eslint-plugin-unused-imports": "^2.0.0",
 		"prettier": "^2.7.1",
 		"prettier-plugin-packagejson": "^2.2.18",
+		"typedoc": "^0.23.14",
 		"typescript": "^4.8.2"
 	}
 }
