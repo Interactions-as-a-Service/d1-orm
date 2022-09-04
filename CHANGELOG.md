@@ -1,5 +1,11 @@
 # d1-orm
 
+## 0.1.1
+
+### Patch Changes
+
+- 8173b4c: Chore: Readme with basic usage examples
+
 ## 0.1.0
 
 ### Minor Changes
