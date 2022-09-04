@@ -14,7 +14,7 @@ $ npm install d1-orm
 
 ## Usage
 
-This package is recommended to be used with [@cloudflare/workers-types](https://github.com/cloudflare/workers-types) 3.0.16+.
+This package is recommended to be used with [@cloudflare/workers-types](https://github.com/cloudflare/workers-types) 3.16.0+.
 
 ```ts
 import { D1Orm, DataTypes, Model } from "d1-orm";
