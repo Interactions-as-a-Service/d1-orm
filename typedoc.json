@@ -1,0 +1,17 @@
+{
+	"$schema": "https://typedoc.org/schema.json",
+	"name": "D1 Orm",
+	"includeVersion": true,
+	"entryPoints": ["./src/index.ts"],
+	"exclude": ["./lib/**", "**/node_modules/**/*.*"],
+	"excludeInternal": true,
+	"excludePrivate": true,
+	"externalSymbolLinkMappings": {
+		"global": {
+			"D1Result": "https://github.com/cloudflare/workers-types/blob/master/overrides/d1.d.ts",
+			"D1Database": "https://github.com/cloudflare/workers-types/blob/master/overrides/d1.d.ts",
+			"D1PreparedStatement": "https://github.com/cloudflare/workers-types/blob/master/overrides/d1.d.ts"
+		}
+	},
+	"out": "./docs"
+}

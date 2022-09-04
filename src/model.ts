@@ -34,8 +34,9 @@ export class Model<T> {
 	readonly #D1Orm: D1Orm;
 
 	public async CreateTable(
-		{ strategy }: CreateTableOptions = { strategy: "default" }
+		options: CreateTableOptions = { strategy: "default" }
 	): Promise<D1Result<unknown>> {
+		const { strategy } = options;
 		if (strategy === "alter") {
 			throw new Error("Alter strategy is not implemented");
 		}
