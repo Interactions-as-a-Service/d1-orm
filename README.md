@@ -137,8 +137,6 @@ await users.Delete({
 This allows you to Insert a model, or Update it if one with that primary key already exists.
 
 ```ts
-// For this example, we'll insert a user with an ID of 1, and then run this again, to update it.
-
 await users.Upsert({
 	insertData: {
 		id: 1,
