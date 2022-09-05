@@ -15,7 +15,7 @@ async function loopDirectories(path = "./docs") {
 
 async function modifyFile(file) {
 	const fileContents = await readFile(file, { encoding: "utf-8" });
-	const newFileContents = fileContents.replace(/.html/g, "");
+	const newFileContents = fileContents.replace(/\.html/g, "");
 	if (fileContents !== newFileContents) {
 		console.log(`Editing ${file}`);
 		await writeFile(file, newFileContents);
