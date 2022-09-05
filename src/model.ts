@@ -7,6 +7,7 @@ import { DataTypes } from "./datatypes";
 export class Model<T> {
 	/**
 	 * @param options - The options for the model. The table name & D1Orm instance are required.
+	 * @param columns - The columns for the model. The keys are the column names, and the values are the column options. See {@link ModelColumn}
 	 * @typeParam T - The type of the model, which will be returned when using methods such as First() or All()
 	 */
 	constructor(options: ModelOptions, columns: ModelColumns) {
@@ -317,8 +318,15 @@ export class Model<T> {
 	}
 }
 
+/**
+ * An object where the keys are the column names, and the values are a {@link ModelColumn}
+ */
 export type ModelColumns = Record<string, ModelColumn>;
 
+/**
+ * The definition of a column in a model.
+ * If the `defaultValue` is provided, it should be of the type defined by your `type`. Blobs should be provided as a [Uint32Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array).
+ */
 export type ModelColumn = {
 	type: DataTypes;
 	primaryKey?: boolean;
@@ -333,8 +341,19 @@ export type ModelOptions = {
 	tableName: string;
 };
 
+/**
+ * The options for the {@link Model.CreateTable} method.
+ *
+ * Note: Using `alter` is not yet supported. You should perform these migrations manually.
+ */
 export type CreateTableOptions = {
 	strategy: "default" | "force" | "alter";
 };
 
+/**
+ * The options for the {@link Model.First} method, amongst other {@link Model} methods.
+ *
+ * May be expanded in future to support more advanced querying, such as OR, NOT, IN operators, etc.
+ * @typeParam T - The type of the model. It will be inferred from the model class, and should not need to be provided by you.
+ */
 export type WhereOptions<T> = Partial<T>;

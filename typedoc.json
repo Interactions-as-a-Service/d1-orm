@@ -1,8 +1,6 @@
 {
 	"$schema": "https://typedoc.org/schema.json",
-	"name": "D1 Orm",
 	"cleanOutputDir": true,
-	"includeVersion": true,
 	"entryPoints": ["./src/index.ts"],
 	"exclude": ["./lib/**", "**/node_modules/**/*.*"],
 	"excludeInternal": true,
@@ -12,8 +10,14 @@
 			"D1Result": "https://github.com/cloudflare/workers-types/blob/master/overrides/d1.d.ts",
 			"D1Database": "https://github.com/cloudflare/workers-types/blob/master/overrides/d1.d.ts",
 			"D1PreparedStatement": "https://github.com/cloudflare/workers-types/blob/master/overrides/d1.d.ts"
+		},
+		"typescript": {
+			"Promise": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise"
 		}
 	},
 	"githubPages": false,
+	"includeVersion": true,
+	"json": "./docs/api.json",
+	"name": "D1 Orm",
 	"out": "./docs"
 }
