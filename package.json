@@ -32,7 +32,7 @@
 		"build:docs": "typedoc",
 		"check:format": "prettier . --check --ignore-unknown --end-of-line lf",
 		"check:lint": "eslint src/*.ts --cache --cache-strategy content --max-warnings=0",
-		"docs:watch": "npm run build:docs --watch",
+		"docs:watch": "npm run build:docs -- --watch",
 		"lint:fix": "eslint src/*.ts --fix",
 		"prettify": "prettier . --write --ignore-unknown --end-of-line lf",
 		"prepublish": "tsc",

@@ -1,3 +1,8 @@
+/**
+ * The D1Orm class is the main class for the ORM. It is used to create models, and to run queries.
+ *
+ * It's methods generally don't need to be called directly, but are instead to be used by the models.
+ */
 export class D1Orm implements D1Database {
 	constructor(database: D1Database) {
 		this.database = database;
