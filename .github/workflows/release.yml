@@ -32,6 +32,9 @@ jobs:
       - name: Check for linting issues
         run: npm run check:lint
 
+      - name: Run tests
+        run: npm run test
+
       - name: Create Release Pull Request
         uses: changesets/action@v1
         with:

@@ -5,6 +5,11 @@
  */
 export class D1Orm implements D1Database {
 	constructor(database: D1Database) {
+		if (!isDatabase(database)) {
+			throw new Error(
+				"Invalid database, should contain prepare, dump, batch, and exec methods"
+			);
+		}
 		this.database = database;
 	}
 
@@ -27,4 +32,14 @@ export class D1Orm implements D1Database {
 	public async exec<T>(query: string): Promise<D1Result<T>> {
 		return this.database.exec<T>(query);
 	}
+}
+
+function isDatabase(database: unknown): database is D1Database {
+	return (
+		!!database &&
+		["prepare", "dump", "batch", "exec"].every(
+			// @ts-expect-error - We're checking if the database is valid
+			(x) => typeof database[x] === "function"
+		)
+	);
 }

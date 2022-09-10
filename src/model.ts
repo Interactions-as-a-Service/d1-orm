@@ -1,5 +1,5 @@
-import { D1Orm } from "./database";
-import { DataTypes } from "./datatypes";
+import { D1Orm } from "./database.js";
+import { DataTypes } from "./datatypes.js";
 
 /**
  * @typeParam T - The type of the model, which will be returned when using methods such as First() or All()
@@ -18,8 +18,11 @@ export class Model<T> {
 		if (!(this.#D1Orm instanceof D1Orm)) {
 			throw new Error("Options.D1Orm is not an instance of D1Orm");
 		}
-		if (!this.tableName?.length) {
-			throw new Error("Options.tableName is not defined");
+		if (typeof this.tableName !== "string" || !this.tableName.length) {
+			throw new Error("Options.tableName must be a string");
+		}
+		if (!columns) {
+			throw new Error("Model columns must be defined");
 		}
 		const columnEntries = Object.entries(this.columns);
 		if (!columnEntries.length) {
@@ -29,7 +32,7 @@ export class Model<T> {
 		for (const [columnName, column] of columnEntries) {
 			if (column.autoIncrement && column.type !== DataTypes.INTEGER) {
 				throw new Error(
-					`Column ${columnName} is autoincrement but is not an integer`
+					`Column "${columnName}" is autoincrement but is not an integer`
 				);
 			}
 		}
@@ -289,7 +292,7 @@ export class Model<T> {
 			(key) => this.columns[key].primaryKey
 		);
 		if (keys.length !== 1) {
-			throw new Error(`Model should have 1 primary key, got: ${keys.length}`);
+			throw new Error(`Model must have 1 primary key, got: ${keys.length}`);
 		}
 		return keys[0];
 	}
