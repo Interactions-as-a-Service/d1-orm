@@ -1,6 +1,6 @@
 {
 	"name": "d1-orm",
-	"version": "0.1.2",
+	"version": "0.1.3",
 	"private": false,
 	"description": "A simple strictly typed ORM for Cloudflare's D1 product",
 	"keywords": [
@@ -37,7 +37,7 @@
 		"prettify": "prettier . --write --ignore-unknown --end-of-line lf",
 		"prepublish": "tsc",
 		"serve": "npm run build:docs && wrangler pages dev docs",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "tsc && mocha"
 	},
 	"eslintConfig": {
 		"parser": "@typescript-eslint/parser",
@@ -106,16 +106,20 @@
 		],
 		"ignorePatterns": [
 			"lib",
-			"node_modules"
+			"node_modules",
+			"test"
 		],
 		"root": true
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.24.4",
 		"@cloudflare/workers-types": "^3.16.0",
+		"@types/mocha": "^9.1.1",
 		"@typescript-eslint/eslint-plugin": "^5.36.1",
+		"chai": "^4.3.6",
 		"eslint-plugin-import": "^2.26.0",
 		"eslint-plugin-unused-imports": "^2.0.0",
+		"mocha": "^10.0.0",
 		"prettier": "^2.7.1",
 		"prettier-plugin-packagejson": "^2.2.18",
 		"typedoc": "^0.23.14",
