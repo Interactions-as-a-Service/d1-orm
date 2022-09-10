@@ -1,6 +1,9 @@
 {
 	"$schema": "https://unpkg.com/@changesets/config@2.1.1/schema.json",
-	"changelog": ["@changesets/changelog-github", { "repo": "Interactions-as-a-Service/d1-orm" }],
+	"changelog": [
+		"@changesets/changelog-github",
+		{ "repo": "Interactions-as-a-Service/d1-orm" }
+	],
 	"commit": false,
 	"fixed": [],
 	"linked": [],
