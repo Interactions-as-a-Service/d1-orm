@@ -1,5 +1,13 @@
 # d1-orm
 
+## 0.1.3
+
+### Patch Changes
+
+- 7ddad51: Chore: start tests
+
+  This initially focuses on just testing Model & ORM validation, with future PRs to be focused on validation of model methods being run
+
 ## 0.1.2
 
 ### Patch Changes
