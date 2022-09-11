@@ -1,3 +1,6 @@
+/**
+ * @enum {string} Aliases for DataTypes used in a {@link ModelColumn} definition.
+ */
 export enum DataTypes {
 	INTEGER = "integer",
 	INT = "integer",

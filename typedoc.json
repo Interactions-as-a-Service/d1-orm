@@ -12,7 +12,11 @@
 			"D1PreparedStatement": "https://github.com/cloudflare/workers-types/blob/master/overrides/d1.d.ts"
 		},
 		"typescript": {
-			"Promise": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise"
+			"Promise": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise",
+			"Partial": "https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype",
+			"Pick": "https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys",
+			"Record": "https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type",
+			"Omit": "https://www.typescriptlang.org/docs/handbook/utility-types.html#omittype-keys"
 		}
 	},
 	"githubPages": false,
