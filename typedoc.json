@@ -37,6 +37,14 @@
 			{
 				"title": "Query Building",
 				"source": "./guides/query-building.md"
+			},
+			{
+				"title": "Models",
+				"source": "./guides/models.md"
+			},
+			{
+				"title": "Upserting",
+				"source": "./guides/upserting.md"
 			}
 		],
 		"source": "",
