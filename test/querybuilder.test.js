@@ -210,5 +210,85 @@ describe("Query Builder", () => {
 				expect(statement.bindings[2]).to.equal("test");
 			});
 		});
+		describe(QueryType.UPSERT, () => {
+			it("should throw an error if invalid options are provided", () => {
+				expect(() => GenerateQuery(QueryType.UPSERT, "test")).to.throw(
+					"Must provide data to insert with, data to update with, and where keys in Upsert"
+				);
+				expect(() =>
+					GenerateQuery(QueryType.UPSERT, "test", {
+						data: { id: 1 },
+					})
+				).to.throw(
+					"Must provide data to insert with, data to update with, and where keys in Upsert"
+				);
+				expect(() =>
+					GenerateQuery(QueryType.UPSERT, "test", {
+						data: { id: 1 },
+						where: { id: 1 },
+					})
+				).to.throw(
+					"Must provide data to insert with, data to update with, and where keys in Upsert"
+				);
+				expect(() =>
+					GenerateQuery(QueryType.UPSERT, "test", {
+						data: { id: 1 },
+						where: { id: 1 },
+						upsertOnlyUpdateData: { id: 1 },
+					})
+				).to.not.throw();
+			});
+			it("should generate a basic query", () => {
+				const statement = GenerateQuery(QueryType.UPSERT, "test", {
+					data: { id: 1 },
+					upsertOnlyUpdateData: { id: 2 },
+					where: { id: 3 },
+				});
+				expect(statement.query).to.equal(
+					"INSERT INTO test (id) VALUES (?) ON CONFLICT (id) DO UPDATE SET id = ? WHERE id = ?"
+				);
+				expect(statement.bindings.length).to.equal(3);
+				expect(statement.bindings[0]).to.equal(1);
+				expect(statement.bindings[1]).to.equal(2);
+				expect(statement.bindings[2]).to.equal(3);
+			});
+			it("should generate a query with multiple columns", () => {
+				const statement = GenerateQuery(QueryType.UPSERT, "test", {
+					data: { id: 1, name: "test" },
+					upsertOnlyUpdateData: { id: 1, name: "test" },
+					where: { id: 1 },
+				});
+				expect(statement.query).to.equal(
+					"INSERT INTO test (id, name) VALUES (?, ?) ON CONFLICT (id) DO UPDATE SET id = ?, name = ? WHERE id = ?"
+				);
+				expect(statement.bindings.length).to.equal(5);
+				expect(statement.bindings[0]).to.equal(1);
+				expect(statement.bindings[1]).to.equal("test");
+				expect(statement.bindings[2]).to.equal(1);
+				expect(statement.bindings[3]).to.equal("test");
+				expect(statement.bindings[4]).to.equal(1);
+			});
+			it("should generate a query with a different ON CONFLICT key", () => {
+				const statement = GenerateQuery(
+					QueryType.UPSERT,
+					"test",
+					{
+						data: { id: 1, name: "test" },
+						upsertOnlyUpdateData: { id: 1, name: "test" },
+						where: { id: 1 },
+					},
+					"name"
+				);
+				expect(statement.query).to.equal(
+					"INSERT INTO test (id, name) VALUES (?, ?) ON CONFLICT (name) DO UPDATE SET id = ?, name = ? WHERE id = ?"
+				);
+				expect(statement.bindings.length).to.equal(5);
+				expect(statement.bindings[0]).to.equal(1);
+				expect(statement.bindings[1]).to.equal("test");
+				expect(statement.bindings[2]).to.equal(1);
+				expect(statement.bindings[3]).to.equal("test");
+				expect(statement.bindings[4]).to.equal(1);
+			});
+		});
 	});
 });

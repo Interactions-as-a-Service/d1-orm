@@ -184,47 +184,18 @@ export class Model<T extends object> {
 	/**
 	 * Upserting is a way to insert a row into the table, or update it if it already exists.
 	 * This is done by using SQLITE's ON CONFLICT clause. As a result, this method should control the primary key for the insert & where clauses, and should not be used with auto incrementing keys.
-	 * @param options The options for the query
-	 * @param options.where - The where clause for the query. This is an object with the column names as keys and the values as values.
-	 * @param options.limit - The limit for the query. This is the maximum number of rows to update.
-	 * @param options.updateData - The data to update the rows with if an `ON CONFLICT` clause occurs. This is an object with the column names as keys and the values as values.
-	 * @param options.insertData - The data to insert. This is an object with the column names as keys and the values as values.
-	 * @throws
-	 * - Throws an error if the data clause is empty.
+	 * @param options The options for the query, see {@link GenerateQueryOptions}
 	 */
-	public async Upsert(options: {
-		where: WhereOptions<T>;
-		updateData: Partial<T>;
-		insertData: Partial<T>;
-	}) {
-		const { where, updateData, insertData } = options;
-		const insertDataKeys = Object.keys(insertData as Record<string, unknown>);
-		const updateDataKeys = Object.keys(updateData as Record<string, unknown>);
-		const whereKeys = Object.keys(where as Record<string, unknown>);
-
-		if (insertDataKeys.length === 0 || updateDataKeys.length === 0) {
-			throw new Error("Upsert called with no data");
-		}
-
-		const bindings = [
-			...Object.values(insertData),
-			...Object.values(updateData),
-			...Object.values(where),
-		];
-		const stmt = `INSERT INTO ${this.tableName} (${insertDataKeys.join(
-			", "
-		)}) VALUES (${insertDataKeys.map(() => "?").join(", ")})
-		ON CONFLICT (${this.#primaryKey}) DO UPDATE SET ${updateDataKeys
-			.map((key) => `${key} = ?`)
-			.join(", ")}
-			${
-				whereKeys.length
-					? `WHERE ${whereKeys.map((x) => `${x} = ?`).join(" AND ")}`
-					: ""
-			};`;
+	public async Upsert(
+		options: Pick<
+			GenerateQueryOptions<T>,
+			"where" | "data" | "upsertOnlyUpdateData"
+		>
+	) {
+		const statement = GenerateQuery(QueryType.UPSERT, this.tableName, options);
 		return this.#D1Orm
-			.prepare(stmt)
-			.bind(...bindings)
+			.prepare(statement.query)
+			.bind(...statement.bindings)
 			.run();
 	}
 

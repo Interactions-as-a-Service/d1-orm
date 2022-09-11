@@ -6,6 +6,7 @@ export enum QueryType {
 	INSERT = "INSERT",
 	UPDATE = "UPDATE",
 	DELETE = "DELETE",
+	UPSERT = "UPSERT",
 }
 
 /**
@@ -18,14 +19,18 @@ export enum QueryType {
  *
  * **orderBy** - The order by clause for the query. See {@link OrderBy} for more information.
  *
+ * **data** - The data to insert, or update with. This is an object with the column names as keys and the values as values. In the case of Upsert, `upsertOnlyUpdateData` is also required, and that will be the data to update with, if an `ON CONFLICT` clause is matched.
+ *
+ * **upsertOnlyUpdateData** - The data to update with, if an `ON CONFLICT` clause is matched. This is an object with the column names as keys and the values as values.
  * @typeParam T - The type of the object to query. This is generally not needed to be specified, but can be useful if you're calling this yourself instead of through a {@link Model}.
  */
 export type GenerateQueryOptions<T extends object> = {
+	where?: Partial<T>;
 	limit?: number;
 	offset?: number;
-	where?: Partial<T>;
-	data?: Partial<T>;
 	orderBy?: OrderBy<T> | OrderBy<T>[];
+	data?: Partial<T>;
+	upsertOnlyUpdateData?: Partial<T>;
 };
 
 /**
@@ -64,7 +69,8 @@ export type ReturnedStatement = {
 export function GenerateQuery<T extends object>(
 	type: QueryType,
 	tableName: string,
-	options: GenerateQueryOptions<T> = {}
+	options: GenerateQueryOptions<T> = {},
+	primaryKey = "id"
 ): ReturnedStatement {
 	if (typeof tableName !== "string" || !tableName.length) {
 		throw new Error("Invalid table name");
@@ -140,6 +146,35 @@ export function GenerateQuery<T extends object>(
 				}
 				query += ` WHERE ${whereStmt.join(" AND ")}`;
 			}
+			break;
+		}
+		case QueryType.UPSERT: {
+			const insertDataKeys = Object.keys(options.data ?? {});
+			const updateDataKeys = Object.keys(options.upsertOnlyUpdateData ?? {});
+			const whereKeys = Object.keys(options.where ?? {});
+			bindings.push(
+				...Object.values(options.data ?? {}),
+				...Object.values(options.upsertOnlyUpdateData ?? {}),
+				...Object.values(options.where ?? {})
+			);
+
+			if (
+				insertDataKeys.length === 0 ||
+				updateDataKeys.length === 0 ||
+				whereKeys.length === 0
+			) {
+				throw new Error(
+					"Must provide data to insert with, data to update with, and where keys in Upsert"
+				);
+			}
+			query = `INSERT INTO ${tableName} (${insertDataKeys.join(", ")})`;
+			query += ` VALUES (${"?"
+				.repeat(insertDataKeys.length)
+				.split("")
+				.join(", ")})`;
+			query += ` ON CONFLICT (${primaryKey}) DO UPDATE SET`;
+			query += ` ${updateDataKeys.map((key) => `${key} = ?`).join(", ")}`;
+			query += ` WHERE ${whereKeys.map((key) => `${key} = ?`).join(" AND ")}`;
 			break;
 		}
 		default:
