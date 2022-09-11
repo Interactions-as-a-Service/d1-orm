@@ -29,7 +29,7 @@
 	],
 	"scripts": {
 		"build": "tsc",
-		"build:docs": "typedoc && node ./scripts/cleanup-docs.js",
+		"build:docs": "typedoc",
 		"check:format": "prettier . --check --ignore-unknown --end-of-line lf",
 		"check:lint": "eslint src/*.ts --cache --cache-strategy content --max-warnings=0",
 		"docs:watch": "typedoc --watch",
@@ -115,6 +115,7 @@
 		"@changesets/changelog-github": "^0.4.6",
 		"@changesets/cli": "^2.24.4",
 		"@cloudflare/workers-types": "^3.16.0",
+		"@knodes/typedoc-plugin-pages": "^0.23.1",
 		"@types/mocha": "^9.1.1",
 		"@typescript-eslint/eslint-plugin": "^5.36.1",
 		"chai": "^4.3.6",

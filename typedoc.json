@@ -23,5 +23,23 @@
 	"includeVersion": true,
 	"json": "./docs/api.json",
 	"name": "D1 Orm",
-	"out": "./docs"
+	"out": "./docs",
+	"pluginPages": {
+		"pages": [
+			{
+				"title": "Changelog",
+				"source": "./CHANGELOG.md"
+			},
+			{
+				"title": "Guides",
+				"source": "./guides/index.md"
+			},
+			{
+				"title": "Query Building",
+				"source": "./guides/query-building.md"
+			}
+		],
+		"source": "",
+		"output": ""
+	}
 }

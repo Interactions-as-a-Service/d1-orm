@@ -2,7 +2,9 @@
 
 ✨ A simple, strictly typed ORM, to assist you in using [Cloudflare's D1 product](https://blog.cloudflare.com/introducing-d1/)
 
-Docs can be found at https://d1-orm.pages.dev
+API reference can be found at https://d1-orm.pages.dev/modules
+
+Docs can be found at https://d1-orm.pages.dev/guides
 
 ## Installation
 
