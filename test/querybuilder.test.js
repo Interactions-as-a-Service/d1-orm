@@ -26,14 +26,14 @@ describe("Query Builder", () => {
 		describe(QueryType.SELECT, () => {
 			it("should generate a basic query", () => {
 				const statement = GenerateQuery(QueryType.SELECT, "test");
-				expect(statement.query).to.equal("SELECT * FROM test");
+				expect(statement.query).to.equal("SELECT * FROM `test`");
 				expect(statement.bindings).to.be.empty;
 			});
 			it("should generate a query with a where clause", () => {
 				const statement = GenerateQuery(QueryType.SELECT, "test", {
 					where: { id: 1 },
 				});
-				expect(statement.query).to.equal("SELECT * FROM test WHERE id = ?");
+				expect(statement.query).to.equal("SELECT * FROM `test` WHERE id = ?");
 				expect(statement.bindings.length).to.equal(1);
 				expect(statement.bindings[0]).to.equal(1);
 			});
@@ -42,7 +42,7 @@ describe("Query Builder", () => {
 					where: { id: 1, name: "test" },
 				});
 				expect(statement.query).to.equal(
-					"SELECT * FROM test WHERE id = ? AND name = ?"
+					"SELECT * FROM `test` WHERE id = ? AND name = ?"
 				);
 				expect(statement.bindings.length).to.equal(2);
 				expect(statement.bindings[0]).to.equal(1);
@@ -52,7 +52,7 @@ describe("Query Builder", () => {
 				const statement = GenerateQuery(QueryType.SELECT, "test", {
 					limit: 10,
 				});
-				expect(statement.query).to.equal("SELECT * FROM test LIMIT 10");
+				expect(statement.query).to.equal("SELECT * FROM `test` LIMIT 10");
 				expect(statement.bindings).to.be.empty;
 			});
 			it("should generate a query with a limit and offset", () => {
@@ -61,7 +61,7 @@ describe("Query Builder", () => {
 					offset: 5,
 				});
 				expect(statement.query).to.equal(
-					"SELECT * FROM test LIMIT 10 OFFSET 5"
+					"SELECT * FROM `test` LIMIT 10 OFFSET 5"
 				);
 				expect(statement.bindings).to.be.empty;
 			});
@@ -72,7 +72,7 @@ describe("Query Builder", () => {
 					orderBy: "id",
 				});
 				expect(statement.query).to.equal(
-					'SELECT * FROM test ORDER BY "id" LIMIT 10 OFFSET 5'
+					'SELECT * FROM `test` ORDER BY "id" LIMIT 10 OFFSET 5'
 				);
 				expect(statement.bindings).to.be.empty;
 			});
@@ -81,7 +81,7 @@ describe("Query Builder", () => {
 					orderBy: { column: "id", descending: true, nullLast: true },
 				});
 				expect(statement.query).to.equal(
-					'SELECT * FROM test ORDER BY "id" DESC NULLS LAST'
+					'SELECT * FROM `test` ORDER BY "id" DESC NULLS LAST'
 				);
 				expect(statement.bindings).to.be.empty;
 			});
@@ -90,7 +90,7 @@ describe("Query Builder", () => {
 					orderBy: [{ column: "id", descending: true, nullLast: true }, "name"],
 				});
 				expect(statement.query).to.equal(
-					'SELECT * FROM test ORDER BY "id" DESC NULLS LAST, "name"'
+					'SELECT * FROM `test` ORDER BY "id" DESC NULLS LAST, "name"'
 				);
 				expect(statement.bindings).to.be.empty;
 			});
@@ -102,7 +102,7 @@ describe("Query Builder", () => {
 					orderBy: [{ column: "name", descending: true }, "id"],
 				});
 				expect(statement.query).to.equal(
-					'SELECT * FROM test WHERE id = ? AND name = ? ORDER BY "name" DESC, "id" LIMIT 10 OFFSET 5'
+					'SELECT * FROM `test` WHERE id = ? AND name = ? ORDER BY "name" DESC, "id" LIMIT 10 OFFSET 5'
 				);
 				expect(statement.bindings.length).to.equal(2);
 				expect(statement.bindings[0]).to.equal(1);
@@ -112,14 +112,14 @@ describe("Query Builder", () => {
 		describe(QueryType.DELETE, () => {
 			it("should generate a basic query", () => {
 				const statement = GenerateQuery(QueryType.DELETE, "test");
-				expect(statement.query).to.equal("DELETE FROM test");
+				expect(statement.query).to.equal("DELETE FROM `test`");
 				expect(statement.bindings).to.be.empty;
 			});
 			it("should generate a query with a where clause", () => {
 				const statement = GenerateQuery(QueryType.DELETE, "test", {
 					where: { id: 1 },
 				});
-				expect(statement.query).to.equal("DELETE FROM test WHERE id = ?");
+				expect(statement.query).to.equal("DELETE FROM `test` WHERE id = ?");
 				expect(statement.bindings.length).to.equal(1);
 				expect(statement.bindings[0]).to.equal(1);
 			});
@@ -128,7 +128,7 @@ describe("Query Builder", () => {
 					where: { id: 1, name: "test" },
 				});
 				expect(statement.query).to.equal(
-					"DELETE FROM test WHERE id = ? AND name = ?"
+					"DELETE FROM `test` WHERE id = ? AND name = ?"
 				);
 				expect(statement.bindings.length).to.equal(2);
 				expect(statement.bindings[0]).to.equal(1);
@@ -150,7 +150,7 @@ describe("Query Builder", () => {
 				const statement = GenerateQuery(QueryType.INSERT, "test", {
 					data: { id: 1 },
 				});
-				expect(statement.query).to.equal("INSERT INTO test (id) VALUES (?)");
+				expect(statement.query).to.equal("INSERT INTO `test` (id) VALUES (?)");
 				expect(statement.bindings.length).to.equal(1);
 				expect(statement.bindings[0]).to.equal(1);
 			});
@@ -159,7 +159,7 @@ describe("Query Builder", () => {
 					data: { id: 1, name: "test" },
 				});
 				expect(statement.query).to.equal(
-					"INSERT INTO test (id, name) VALUES (?, ?)"
+					"INSERT INTO `test` (id, name) VALUES (?, ?)"
 				);
 				expect(statement.bindings.length).to.equal(2);
 				expect(statement.bindings[0]).to.equal(1);
@@ -181,7 +181,7 @@ describe("Query Builder", () => {
 				const statement = GenerateQuery(QueryType.UPDATE, "test", {
 					data: { id: 1 },
 				});
-				expect(statement.query).to.equal("UPDATE test SET id = ?");
+				expect(statement.query).to.equal("UPDATE `test` SET id = ?");
 				expect(statement.bindings.length).to.equal(1);
 				expect(statement.bindings[0]).to.equal(1);
 			});
@@ -189,7 +189,7 @@ describe("Query Builder", () => {
 				const statement = GenerateQuery(QueryType.UPDATE, "test", {
 					data: { id: 1, name: "test" },
 				});
-				expect(statement.query).to.equal("UPDATE test SET id = ?, name = ?");
+				expect(statement.query).to.equal("UPDATE `test` SET id = ?, name = ?");
 				expect(statement.bindings.length).to.equal(2);
 				expect(statement.bindings[0]).to.equal(1);
 				expect(statement.bindings[1]).to.equal("test");
@@ -200,7 +200,7 @@ describe("Query Builder", () => {
 					where: { id: 1 },
 				});
 				expect(statement.query).to.equal(
-					"UPDATE test SET name = ? WHERE id = ?"
+					"UPDATE `test` SET name = ? WHERE id = ?"
 				);
 				expect(statement.bindings.length).to.equal(2);
 				expect(statement.bindings[0]).to.equal("test");
@@ -212,7 +212,7 @@ describe("Query Builder", () => {
 					where: { id: 1, name: "test" },
 				});
 				expect(statement.query).to.equal(
-					"UPDATE test SET name = ? WHERE id = ? AND name = ?"
+					"UPDATE `test` SET name = ? WHERE id = ? AND name = ?"
 				);
 				expect(statement.bindings.length).to.equal(3);
 				expect(statement.bindings[0]).to.equal("test");
@@ -255,7 +255,7 @@ describe("Query Builder", () => {
 					where: { id: 3 },
 				});
 				expect(statement.query).to.equal(
-					"INSERT INTO test (id) VALUES (?) ON CONFLICT (id) DO UPDATE SET id = ? WHERE id = ?"
+					"INSERT INTO `test` (id) VALUES (?) ON CONFLICT (id) DO UPDATE SET id = ? WHERE id = ?"
 				);
 				expect(statement.bindings.length).to.equal(3);
 				expect(statement.bindings[0]).to.equal(1);
@@ -269,7 +269,7 @@ describe("Query Builder", () => {
 					where: { id: 1 },
 				});
 				expect(statement.query).to.equal(
-					"INSERT INTO test (id, name) VALUES (?, ?) ON CONFLICT (id) DO UPDATE SET id = ?, name = ? WHERE id = ?"
+					"INSERT INTO `test` (id, name) VALUES (?, ?) ON CONFLICT (id) DO UPDATE SET id = ?, name = ? WHERE id = ?"
 				);
 				expect(statement.bindings.length).to.equal(5);
 				expect(statement.bindings[0]).to.equal(1);
@@ -290,7 +290,7 @@ describe("Query Builder", () => {
 					"name"
 				);
 				expect(statement.query).to.equal(
-					"INSERT INTO test (id, name) VALUES (?, ?) ON CONFLICT (name) DO UPDATE SET id = ?, name = ? WHERE id = ?"
+					"INSERT INTO `test` (id, name) VALUES (?, ?) ON CONFLICT (name) DO UPDATE SET id = ?, name = ? WHERE id = ?"
 				);
 				expect(statement.bindings.length).to.equal(5);
 				expect(statement.bindings[0]).to.equal(1);

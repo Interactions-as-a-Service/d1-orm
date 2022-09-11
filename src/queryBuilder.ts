@@ -69,7 +69,7 @@ export function GenerateQuery<T extends object>(
 	const bindings: unknown[] = [];
 	switch (type) {
 		case QueryType.SELECT: {
-			query = `SELECT * FROM ${tableName}`;
+			query = `SELECT * FROM \`${tableName}\``;
 			if (options.where) {
 				const whereStmt = [];
 				for (const [key, value] of Object.entries(options.where)) {
@@ -90,7 +90,7 @@ export function GenerateQuery<T extends object>(
 			break;
 		}
 		case QueryType.DELETE: {
-			query = `DELETE FROM ${tableName}`;
+			query = `DELETE FROM \`${tableName}\``;
 			if (options.where) {
 				const whereStmt = [];
 				for (const [key, value] of Object.entries(options.where)) {
@@ -102,7 +102,7 @@ export function GenerateQuery<T extends object>(
 			break;
 		}
 		case QueryType.INSERT: {
-			query = `INSERT INTO ${tableName}`;
+			query = `INSERT INTO \`${tableName}\``;
 			if (
 				typeof options.data !== "object" ||
 				Object.getOwnPropertyNames(options.data).length === 0
@@ -121,7 +121,7 @@ export function GenerateQuery<T extends object>(
 			break;
 		}
 		case QueryType.UPDATE: {
-			query = `UPDATE ${tableName}`;
+			query = `UPDATE \`${tableName}\``;
 			if (
 				typeof options.data !== "object" ||
 				Object.getOwnPropertyNames(options.data).length === 0
@@ -163,7 +163,7 @@ export function GenerateQuery<T extends object>(
 					"Must provide data to insert with, data to update with, and where keys in Upsert"
 				);
 			}
-			query = `INSERT INTO ${tableName} (${insertDataKeys.join(", ")})`;
+			query = `INSERT INTO \`${tableName}\` (${insertDataKeys.join(", ")})`;
 			query += ` VALUES (${"?"
 				.repeat(insertDataKeys.length)
 				.split("")
