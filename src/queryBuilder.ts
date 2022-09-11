@@ -17,19 +17,18 @@ export type OrderBy<T extends object> =
 	| keyof T
 	| { column: keyof T; descending: boolean; nullLast?: boolean };
 
+export type ReturnedStatement = {
+	query: string;
+	bindings: unknown[];
+};
+
 export function GenerateQuery<T extends object>(
 	type: QueryType,
 	table: string,
-	prepare: (query: string) => D1PreparedStatement,
 	options: GenerateQueryOptions<T> = {}
-): D1PreparedStatement {
+): ReturnedStatement {
 	if (typeof table !== "string" || !table.length) {
 		throw new Error("Invalid table name");
-	}
-	if (typeof prepare !== "function") {
-		throw new Error(
-			"Must provide a prepare method which returns a D1PreparedStatement"
-		);
 	}
 	let query = "";
 	const bindings: unknown[] = [];
@@ -107,13 +106,10 @@ export function GenerateQuery<T extends object>(
 		default:
 			throw new Error("Invalid QueryType provided");
 	}
-	const prepared = prepare(query);
-	if (!prepared?.bind || typeof prepared.bind !== "function") {
-		throw new Error(
-			"Must provide a prepare method which returns a D1PreparedStatement"
-		);
-	}
-	return prepared.bind(...bindings);
+	return {
+		query,
+		bindings,
+	};
 }
 
 function transformOrderBy<T extends object>(
