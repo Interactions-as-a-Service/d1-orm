@@ -50,28 +50,18 @@ export type OrderBy<T extends object> =
 	| { column: keyof T; descending: boolean; nullLast?: boolean };
 
 /**
- * ReturnedStatement is the return type of {@link GenerateQuery}
- *
- * The query is the SQL query to be executed, and the bindings are an array of sorted values to be bound to the query.
- */
-export type ReturnedStatement = {
-	query: string;
-	bindings: unknown[];
-};
-
-/**
  * @param type - The type of query to generate, see {@link QueryType}
  * @param tableName - The table to query
  * @param options - The options for the query, see {@link GenerateQueryOptions}
  * @typeParam T - The type of the object to query. This is generally not needed to be specified, but can be useful if you're calling this yourself instead of through a {@link Model}.
- * @returns See {@link ReturnedStatement}
+ * @returns The query and bindings to be executed
  */
 export function GenerateQuery<T extends object>(
 	type: QueryType,
 	tableName: string,
 	options: GenerateQueryOptions<T> = {},
 	primaryKey = "id"
-): ReturnedStatement {
+): { bindings: unknown[]; query: string } {
 	if (typeof tableName !== "string" || !tableName.length) {
 		throw new Error("Invalid table name");
 	}

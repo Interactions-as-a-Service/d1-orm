@@ -9,10 +9,18 @@ import type { GenerateQueryOptions } from "./queryBuilder.js";
 export class Model<T extends object> {
 	/**
 	 * @param options - The options for the model. The table name & D1Orm instance are required.
+	 * @param options.tableName - The name of the table to use.
+	 * @param options.D1Orm - The D1Orm instance to use.
 	 * @param columns - The columns for the model. The keys are the column names, and the values are the column options. See {@link ModelColumn}
 	 * @typeParam T - The type of the model, which will be returned when using methods such as First() or All()
 	 */
-	constructor(options: ModelOptions, columns: ModelColumns) {
+	constructor(
+		options: {
+			D1Orm: D1Orm;
+			tableName: string;
+		},
+		columns: Record<string, ModelColumn>
+	) {
 		this.#D1Orm = options.D1Orm;
 		this.tableName = options.tableName;
 		this.columns = columns;
@@ -43,7 +51,7 @@ export class Model<T extends object> {
 		this.#primaryKey;
 	}
 	public tableName: string;
-	public readonly columns: ModelColumns;
+	public readonly columns: Record<string, ModelColumn>;
 	readonly #D1Orm: D1Orm;
 
 	/**
@@ -211,11 +219,6 @@ export class Model<T extends object> {
 }
 
 /**
- * An object where the keys are the column names, and the values are a {@link ModelColumn}
- */
-export type ModelColumns = Record<string, ModelColumn>;
-
-/**
  * The definition of a column in a model.
  * If the `defaultValue` is provided, it should be of the type defined by your `type`. Blobs should be provided as a [Uint32Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array).
  */
@@ -227,16 +230,3 @@ export type ModelColumn = {
 	autoIncrement?: boolean;
 	defaultValue?: unknown;
 };
-
-export type ModelOptions = {
-	D1Orm: D1Orm;
-	tableName: string;
-};
-
-/**
- * The options for the {@link Model.First} method, amongst other {@link Model} methods.
- *
- * May be expanded in future to support more advanced querying, such as OR, NOT, IN operators, etc.
- * @typeParam T - The type of the model. It will be inferred from the model class, and should not need to be provided by you.
- */
-export type WhereOptions<T> = Partial<T>;
