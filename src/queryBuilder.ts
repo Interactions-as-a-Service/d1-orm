@@ -1,3 +1,6 @@
+/**
+ * @enum {string} - The type of the query
+ */
 export enum QueryType {
 	SELECT = "SELECT",
 	INSERT = "INSERT",
@@ -5,6 +8,18 @@ export enum QueryType {
 	DELETE = "DELETE",
 }
 
+/**
+ * @param _
+ * **where** - The where clause for the query. This is an object with the column names as keys and the values as values.
+ *
+ * **limit** - The limit for the query. This is the maximum number of rows to return.
+ *
+ * **offset** - The offset for the query. This is the number of rows to skip before returning.
+ *
+ * **orderBy** - The order by clause for the query. See {@link OrderBy} for more information.
+ *
+ * @typeParam T - The type of the object to query. This is generally not needed to be specified, but can be useful if you're calling this yourself instead of through a {@link Model}.
+ */
 export type GenerateQueryOptions<T extends object> = {
 	limit?: number;
 	offset?: number;
@@ -13,15 +28,39 @@ export type GenerateQueryOptions<T extends object> = {
 	orderBy?: OrderBy<T> | OrderBy<T>[];
 };
 
+/**
+ * @typeParam T - The type of the object to query. This is generally not needed to be specified, but can be useful if you're calling this yourself instead of through a {@link Model}.
+ * ```ts
+ * {
+ * 	// Any of these are valid
+ * 	orderBy: 'id',
+ * 	orderBy: ['id', 'name'],
+ * 	orderBy: { column: 'id', descending: true, nullLast: true },
+ * 	orderBy: [{ column: 'id', descending: true, nullLast: true }, { column: 'name', descending: false, nullLast: false }],
+ * }
+ * ```
+ */
 export type OrderBy<T extends object> =
 	| keyof T
 	| { column: keyof T; descending: boolean; nullLast?: boolean };
 
+/**
+ * ReturnedStatement is the return type of {@link GenerateQuery}
+ *
+ * The query is the SQL query to be executed, and the bindings are an array of sorted values to be bound to the query.
+ */
 export type ReturnedStatement = {
 	query: string;
 	bindings: unknown[];
 };
 
+/**
+ * @param type - The type of query to generate, see {@link QueryType}
+ * @param tableName - The table to query
+ * @param options - The options for the query, see {@link GenerateQueryOptions}
+ * @typeParam T - The type of the object to query. This is generally not needed to be specified, but can be useful if you're calling this yourself instead of through a {@link Model}.
+ * @returns See {@link ReturnedStatement}
+ */
 export function GenerateQuery<T extends object>(
 	type: QueryType,
 	tableName: string,

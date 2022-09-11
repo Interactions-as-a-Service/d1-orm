@@ -1,10 +1,12 @@
 import { D1Orm } from "./database.js";
 import { DataTypes } from "./datatypes.js";
+import { QueryType, GenerateQuery } from "./queryBuilder.js";
+import type { GenerateQueryOptions } from "./queryBuilder.js";
 
 /**
  * @typeParam T - The type of the model, which will be returned when using methods such as First() or All()
  */
-export class Model<T> {
+export class Model<T extends object> {
 	/**
 	 * @param options - The options for the model. The table name & D1Orm instance are required.
 	 * @param columns - The columns for the model. The keys are the column names, and the values are the column options. See {@link ModelColumn}
@@ -54,7 +56,9 @@ export class Model<T> {
 	 * - Throws an error if the strategy is "alter", as this is not yet implemented
 	 */
 	public async CreateTable(
-		options: CreateTableOptions = { strategy: "default" }
+		options: { strategy: "default" | "force" | "alter" } = {
+			strategy: "default",
+		}
 	): Promise<D1Result<unknown>> {
 		const { strategy } = options;
 		if (strategy === "alter") {
@@ -103,7 +107,11 @@ export class Model<T> {
 	 * @param data The data to insert into the table, as an object with the column names as keys and the values as values.
 	 */
 	public async InsertOne(data: Partial<T>): Promise<D1Result<T>> {
-		return this.#createInsertStatement(data).first<D1Result<T>>();
+		const statement = GenerateQuery(QueryType.INSERT, this.tableName, data);
+		return this.#D1Orm
+			.prepare(statement.query)
+			.bind(...statement.bindings)
+			.run();
 	}
 
 	/**
@@ -112,132 +120,65 @@ export class Model<T> {
 	public async InsertMany(data: Partial<T>[]): Promise<D1Result<T>[]> {
 		const stmts: D1PreparedStatement[] = [];
 		for (const row of data) {
-			stmts.push(this.#createInsertStatement(row));
+			const stmt = GenerateQuery(QueryType.INSERT, this.tableName, row);
+			stmts.push(this.#D1Orm.prepare(stmt.query).bind(...stmt.bindings));
 		}
 		return this.#D1Orm.batch<T>(stmts);
 	}
 
 	/**
-	 * @param options The options for the query
-	 * @param options.where - The where clause for the query. This is an object with the column names as keys and the values as values.
+	 * @param options The options for the query, see {@link GenerateQueryOptions}
 	 * @returns Returns the first row that matches the where clause.
 	 */
-	public async First(options: {
-		where: WhereOptions<T>;
-	}): Promise<D1Result<T>> {
-		const { where } = options;
-		const objectKeys = Object.keys(where as Record<string, unknown>);
-		if (objectKeys.length === 0) {
-			return this.#D1Orm
-				.prepare(`SELECT * FROM ${this.tableName} LIMIT 1;`)
-				.first<D1Result<T>>();
-		}
-		const stmt = this.#statementAddBindings(
-			`SELECT * FROM ${this.tableName} WHERE ` +
-				objectKeys.map((key) => `${key} = ?`).join(" AND ") +
-				" LIMIT 1;",
-			where
-		);
-		return stmt.first<D1Result<T>>();
+	public async First(
+		options: Pick<GenerateQueryOptions<T>, "where">
+	): Promise<D1Result<T>> {
+		const statement = GenerateQuery(QueryType.SELECT, this.tableName, options);
+		return this.#D1Orm
+			.prepare(statement.query)
+			.bind(...statement.bindings)
+			.first();
 	}
 
 	/**
-	 * @param options The options for the query
-	 * @param options.where - The where clause for the query. This is an object with the column names as keys and the values as values.
-	 * @param options.limit - The limit for the query. This is the maximum number of rows to return.
+	 * @param options The options for the query, see {@link GenerateQueryOptions}
 	 * @returns Returns all rows that match the where clause.
 	 */
-	public async All(options: {
-		where: WhereOptions<T>;
-		limit?: number;
-	}): Promise<D1Result<T[]>> {
-		const { where, limit } = options;
-		const objectKeys = Object.keys(where as Record<string, unknown>);
-		if (objectKeys.length === 0) {
-			return this.#D1Orm
-				.prepare(
-					`SELECT * FROM ${this.tableName}${limit ? ` LIMIT ${limit}` : ""};`
-				)
-				.all<T>();
-		}
-		const stmt = this.#statementAddBindings(
-			`SELECT * FROM ${this.tableName} WHERE` +
-				objectKeys.map((key) => `${key} = ?`).join(" AND ") +
-				(limit ? ` LIMIT ${limit}` : ""),
-			where
-		);
-		return stmt.all<T>();
+	public async All(
+		options: Omit<GenerateQueryOptions<T>, "data">
+	): Promise<D1Result<T[]>> {
+		const statement = GenerateQuery(QueryType.SELECT, this.tableName, options);
+		return this.#D1Orm
+			.prepare(statement.query)
+			.bind(...statement.bindings)
+			.all();
 	}
 
 	/**
-	 * @param options The options for the query
-	 * @param options.where - The where clause for the query. This is an object with the column names as keys and the values as values.
-	 * @param options.limit - The limit for the query. This is the maximum number of rows to delete.
+	 * @param options The options for the query, see {@link GenerateQueryOptions}
 	 */
-	public async Delete(options: {
-		where: WhereOptions<T>;
-		limit?: number;
-	}): Promise<D1Result<unknown>> {
-		const { where, limit } = options;
-		const objectKeys = Object.keys(where as Record<string, unknown>);
-		if (objectKeys.length === 0) {
-			return this.#D1Orm
-				.prepare(
-					`DELETE FROM ${this.tableName}${limit ? `LIMIT ${limit}` : ""};`
-				)
-				.run();
-		}
-		const stmt = this.#statementAddBindings(
-			`DELETE FROM ${this.tableName} WHERE ` +
-				objectKeys.map((key) => `${key} = ?`).join(" AND ") +
-				(limit ? ` LIMIT ${limit}` : ""),
-			where
-		);
-		return stmt.run();
+	public async Delete(
+		options: Pick<GenerateQueryOptions<T>, "where">
+	): Promise<D1Result<unknown>> {
+		const statement = GenerateQuery(QueryType.DELETE, this.tableName, options);
+		return this.#D1Orm
+			.prepare(statement.query)
+			.bind(...statement.bindings)
+			.run();
 	}
 
 	/**
-	 * @param options The options for the query
-	 * @param options.where - The where clause for the query. This is an object with the column names as keys and the values as values.
-	 * @param options.limit - The limit for the query. This is the maximum number of rows to update.
-	 * @param options.data - The data to update the rows with. This is an object with the column names as keys and the values as values.
-	 * @throws
-	 * - Throws an error if the data clause is empty.
+	 * @param options The options for the query, see {@link GenerateQueryOptions}
+	 * @throws Throws an error if the data clause is empty.
 	 */
-	public async Update(options: {
-		where: WhereOptions<T>;
-		data: Partial<T>;
-		limit?: number;
-	}): Promise<D1Result<unknown>> {
-		const { where, data } = options;
-		const dataKeys = Object.keys(data as Record<string, unknown>);
-		const whereKeys = Object.keys(where as Record<string, unknown>);
-		if (dataKeys.length === 0) {
-			throw new Error("Update called with no data");
-		}
-		if (whereKeys.length === 0) {
-			return this.#D1Orm
-				.prepare(
-					`UPDATE ${this.tableName} SET ${Object.keys(data)
-						.map((key) => `${key} = ?`)
-						.join(", ")}`
-				)
-				.bind(...Object.values(data))
-				.run();
-		}
-		const stmtArray = [...Object.values(data), ...Object.values(where)];
-		const params: Record<number, unknown> = {};
-		for (let i = 0; i < stmtArray.length; i++) {
-			params[i] = stmtArray[i];
-		}
-		const stmt = this.#statementAddBindings(
-			`UPDATE ${this.tableName} SET ${Object.keys(data)
-				.map((key) => `${key} = ?`)
-				.join(", ")} WHERE ` +
-				whereKeys.map((key) => `${key} = ?`).join(" AND "),
-			params
-		);
-		return stmt.run();
+	public async Update(
+		options: Pick<GenerateQueryOptions<T>, "where" | "data">
+	): Promise<D1Result<unknown>> {
+		const statement = GenerateQuery(QueryType.UPDATE, this.tableName, options);
+		return this.#D1Orm
+			.prepare(statement.query)
+			.bind(...statement.bindings)
+			.run();
 	}
 
 	/**
@@ -296,29 +237,6 @@ export class Model<T> {
 		}
 		return keys[0];
 	}
-
-	#statementAddBindings(
-		query: string,
-		data: Record<string, unknown>
-	): D1PreparedStatement {
-		const statement = this.#D1Orm.prepare(query).bind(...Object.values(data));
-		return statement;
-	}
-
-	#createInsertStatement(data: Partial<T>): D1PreparedStatement {
-		const dataRecord = data as Record<string, unknown>;
-		const columnNames = Object.keys(dataRecord);
-		const columnSize = columnNames.length;
-		if (columnSize === 0) {
-			throw new Error("Insert called with no columns");
-		}
-		return this.#statementAddBindings(
-			`INSERT INTO ${this.tableName} (${columnNames.join(
-				", "
-			)}) VALUES (${"?, ".repeat(columnSize - 1)}?) RETURNING *;`,
-			dataRecord
-		);
-	}
 }
 
 /**
@@ -342,15 +260,6 @@ export type ModelColumn = {
 export type ModelOptions = {
 	D1Orm: D1Orm;
 	tableName: string;
-};
-
-/**
- * The options for the {@link Model.CreateTable} method.
- *
- * Note: Using `alter` is not yet supported. You should perform these migrations manually.
- */
-export type CreateTableOptions = {
-	strategy: "default" | "force" | "alter";
 };
 
 /**
