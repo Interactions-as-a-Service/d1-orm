@@ -65,15 +65,6 @@ export function GenerateQuery<T extends object>(
 				}
 				query += ` WHERE ${whereStmt.join(" AND ")}`;
 			}
-			if (options.orderBy) {
-				query += " ORDER BY " + transformOrderBy(options.orderBy);
-			}
-			if (options.limit) {
-				query += ` LIMIT ${options.limit}`;
-				if (options.offset) {
-					query += ` OFFSET ${options.offset}`;
-				}
-			}
 			break;
 		}
 		case QueryType.INSERT: {

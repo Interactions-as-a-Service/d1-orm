@@ -119,6 +119,32 @@ describe("Query Builder", () => {
 				expect(query.bindings[1]).to.equal("test");
 			});
 		});
+		describe(QueryType.DELETE, () => {
+			it("should generate a basic query", () => {
+				const query = GenerateQuery(QueryType.DELETE, "test", prepare);
+				expect(query.statement).to.equal("DELETE FROM test");
+				expect(query.bindings).to.be.empty;
+			});
+			it("should generate a query with a where clause", () => {
+				const query = GenerateQuery(QueryType.DELETE, "test", prepare, {
+					where: { id: 1 },
+				});
+				expect(query.statement).to.equal("DELETE FROM test WHERE id = ?");
+				expect(query.bindings.length).to.equal(1);
+				expect(query.bindings[0]).to.equal(1);
+			});
+			it("should generate a query with a where clause with multiple conditions", () => {
+				const query = GenerateQuery(QueryType.DELETE, "test", prepare, {
+					where: { id: 1, name: "test" },
+				});
+				expect(query.statement).to.equal(
+					"DELETE FROM test WHERE id = ? AND name = ?"
+				);
+				expect(query.bindings.length).to.equal(2);
+				expect(query.bindings[0]).to.equal(1);
+				expect(query.bindings[1]).to.equal("test");
+			});
+		});
 	});
 });
 
