@@ -88,15 +88,31 @@ describe("Query Builder", () => {
 				);
 				expect(query.bindings).to.be.empty;
 			});
+			it("should accept orderBy as an object", () => {
+				const query = GenerateQuery("SELECT", "test", prepare, {
+					orderBy: { column: "id", descending: true, nullLast: true },
+				});
+				expect(query.statement).to.equal(
+					'SELECT * FROM test ORDER BY "id" DESC NULLS LAST'
+				);
+			});
+			it("should accept orderBy as an array", () => {
+				const query = GenerateQuery("SELECT", "test", prepare, {
+					orderBy: [{ column: "id", descending: true, nullLast: true }, "name"],
+				});
+				expect(query.statement).to.equal(
+					'SELECT * FROM test ORDER BY "id" DESC NULLS LAST, "name"'
+				);
+			});
 			it("should generate a query with a where clause with multiple conditions and a limit and offset and order", () => {
 				const query = GenerateQuery("SELECT", "test", prepare, {
 					where: { id: 1, name: "test" },
 					limit: 10,
 					offset: 5,
-					orderBy: "id",
+					orderBy: [{ column: "name", descending: true }, "id"],
 				});
 				expect(query.statement).to.equal(
-					'SELECT * FROM test WHERE id = ? AND name = ? ORDER BY "id" LIMIT 10 OFFSET 5'
+					'SELECT * FROM test WHERE id = ? AND name = ? ORDER BY "name" DESC, "id" LIMIT 10 OFFSET 5'
 				);
 				expect(query.bindings.length).to.equal(2);
 				expect(query.bindings[0]).to.equal(1);

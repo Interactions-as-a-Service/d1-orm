@@ -5,15 +5,19 @@ export enum QueryType {
 	DELETE = "DELETE",
 }
 
-export type GenerateQueryOptions<T> = {
+export type GenerateQueryOptions<T extends object> = {
 	limit?: number;
 	offset?: number;
 	where?: Partial<T>;
 	data?: Partial<T>;
-	orderBy?: keyof T;
+	orderBy?: OrderBy<T> | OrderBy<T>[];
 };
 
-export function GenerateQuery<T>(
+export type OrderBy<T extends object> =
+	| keyof T
+	| { column: keyof T; descending: boolean; nullLast?: boolean };
+
+export function GenerateQuery<T extends object>(
 	type: QueryType,
 	table: string,
 	prepare: (query: string) => D1PreparedStatement,
@@ -41,7 +45,7 @@ export function GenerateQuery<T>(
 				query += ` WHERE ${whereStmt.join(" AND ")}`;
 			}
 			if (options.orderBy) {
-				query += ` ORDER BY "${String(options.orderBy)}"`;
+				query += " ORDER BY " + transformOrderBy(options.orderBy);
 			}
 			if (options.limit) {
 				query += ` LIMIT ${options.limit}`;
@@ -62,7 +66,7 @@ export function GenerateQuery<T>(
 				query += ` WHERE ${whereStmt.join(" AND ")}`;
 			}
 			if (options.orderBy) {
-				query += ` ORDER BY "${String(options.orderBy)}"`;
+				query += " ORDER BY " + transformOrderBy(options.orderBy);
 			}
 			if (options.limit) {
 				query += ` LIMIT ${options.limit}`;
@@ -119,4 +123,24 @@ export function GenerateQuery<T>(
 		);
 	}
 	return prepared.bind(...bindings);
+}
+
+function transformOrderBy<T extends object>(
+	orderBy: OrderBy<T> | OrderBy<T>[]
+): string {
+	if (Array.isArray(orderBy)) {
+		return orderBy.map((o) => transformOrderBy(o)).join(", ");
+	}
+	if (
+		typeof orderBy === "string" ||
+		typeof orderBy === "symbol" ||
+		typeof orderBy === "number"
+	) {
+		return `"${String(orderBy)}"`;
+	}
+	return (
+		`"${String(orderBy.column)}"` +
+		(orderBy.descending ? " DESC" : "") +
+		(orderBy.nullLast ? " NULLS LAST" : "")
+	);
 }
