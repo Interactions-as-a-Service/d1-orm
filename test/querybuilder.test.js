@@ -141,6 +141,11 @@ describe("Query Builder", () => {
 					"Must provide data to insert"
 				);
 			});
+			it("should throw an error if empty data is provided", () => {
+				expect(() =>
+					GenerateQuery(QueryType.INSERT, "test", { data: {} })
+				).to.throw("Must provide data to insert");
+			});
 			it("should generate a basic query", () => {
 				const statement = GenerateQuery(QueryType.INSERT, "test", {
 					data: { id: 1 },
@@ -166,6 +171,11 @@ describe("Query Builder", () => {
 				expect(() => GenerateQuery(QueryType.UPDATE, "test")).to.throw(
 					"Must provide data to update"
 				);
+			});
+			it("should throw an error if empty data is provided", () => {
+				expect(() =>
+					GenerateQuery(QueryType.UPDATE, "test", { data: {} })
+				).to.throw("Must provide data to update");
 			});
 			it("should generate a basic query", () => {
 				const statement = GenerateQuery(QueryType.UPDATE, "test", {

@@ -103,7 +103,10 @@ export function GenerateQuery<T extends object>(
 		}
 		case QueryType.INSERT: {
 			query = `INSERT INTO ${tableName}`;
-			if (typeof options.data !== "object") {
+			if (
+				typeof options.data !== "object" ||
+				Object.getOwnPropertyNames(options.data).length === 0
+			) {
 				throw new Error("Must provide data to insert");
 			}
 			const keys = [];
@@ -119,7 +122,10 @@ export function GenerateQuery<T extends object>(
 		}
 		case QueryType.UPDATE: {
 			query = `UPDATE ${tableName}`;
-			if (typeof options.data !== "object") {
+			if (
+				typeof options.data !== "object" ||
+				Object.getOwnPropertyNames(options.data).length === 0
+			) {
 				throw new Error("Must provide data to update");
 			}
 			const keys = [];
