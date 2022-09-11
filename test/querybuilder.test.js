@@ -135,5 +135,80 @@ describe("Query Builder", () => {
 				expect(statement.bindings[1]).to.equal("test");
 			});
 		});
+		describe(QueryType.INSERT, () => {
+			it("should throw an error if no data is provided", () => {
+				expect(() => GenerateQuery(QueryType.INSERT, "test")).to.throw(
+					"Must provide data to insert"
+				);
+			});
+			it("should generate a basic query", () => {
+				const statement = GenerateQuery(QueryType.INSERT, "test", {
+					data: { id: 1 },
+				});
+				expect(statement.query).to.equal("INSERT INTO test (id) VALUES (?)");
+				expect(statement.bindings.length).to.equal(1);
+				expect(statement.bindings[0]).to.equal(1);
+			});
+			it("should generate a query with multiple columns", () => {
+				const statement = GenerateQuery(QueryType.INSERT, "test", {
+					data: { id: 1, name: "test" },
+				});
+				expect(statement.query).to.equal(
+					"INSERT INTO test (id, name) VALUES (?, ?)"
+				);
+				expect(statement.bindings.length).to.equal(2);
+				expect(statement.bindings[0]).to.equal(1);
+				expect(statement.bindings[1]).to.equal("test");
+			});
+		});
+		describe(QueryType.UPDATE, () => {
+			it("should throw an error if no data is provided", () => {
+				expect(() => GenerateQuery(QueryType.UPDATE, "test")).to.throw(
+					"Must provide data to update"
+				);
+			});
+			it("should generate a basic query", () => {
+				const statement = GenerateQuery(QueryType.UPDATE, "test", {
+					data: { id: 1 },
+				});
+				expect(statement.query).to.equal("UPDATE test SET id = ?");
+				expect(statement.bindings.length).to.equal(1);
+				expect(statement.bindings[0]).to.equal(1);
+			});
+			it("should generate a query with multiple columns", () => {
+				const statement = GenerateQuery(QueryType.UPDATE, "test", {
+					data: { id: 1, name: "test" },
+				});
+				expect(statement.query).to.equal("UPDATE test SET id = ?, name = ?");
+				expect(statement.bindings.length).to.equal(2);
+				expect(statement.bindings[0]).to.equal(1);
+				expect(statement.bindings[1]).to.equal("test");
+			});
+			it("should generate a query with a where clause", () => {
+				const statement = GenerateQuery(QueryType.UPDATE, "test", {
+					data: { name: "test" },
+					where: { id: 1 },
+				});
+				expect(statement.query).to.equal(
+					"UPDATE test SET name = ? WHERE id = ?"
+				);
+				expect(statement.bindings.length).to.equal(2);
+				expect(statement.bindings[0]).to.equal("test");
+				expect(statement.bindings[1]).to.equal(1);
+			});
+			it("should generate a query with a where clause with multiple conditions", () => {
+				const statement = GenerateQuery(QueryType.UPDATE, "test", {
+					data: { name: "test" },
+					where: { id: 1, name: "test" },
+				});
+				expect(statement.query).to.equal(
+					"UPDATE test SET name = ? WHERE id = ? AND name = ?"
+				);
+				expect(statement.bindings.length).to.equal(3);
+				expect(statement.bindings[0]).to.equal("test");
+				expect(statement.bindings[1]).to.equal(1);
+				expect(statement.bindings[2]).to.equal("test");
+			});
+		});
 	});
 });
