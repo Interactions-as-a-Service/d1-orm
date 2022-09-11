@@ -24,17 +24,17 @@ export type ReturnedStatement = {
 
 export function GenerateQuery<T extends object>(
 	type: QueryType,
-	table: string,
+	tableName: string,
 	options: GenerateQueryOptions<T> = {}
 ): ReturnedStatement {
-	if (typeof table !== "string" || !table.length) {
+	if (typeof tableName !== "string" || !tableName.length) {
 		throw new Error("Invalid table name");
 	}
 	let query = "";
 	const bindings: unknown[] = [];
 	switch (type) {
 		case QueryType.SELECT: {
-			query = `SELECT * FROM ${table}`;
+			query = `SELECT * FROM ${tableName}`;
 			if (options.where) {
 				const whereStmt = [];
 				for (const [key, value] of Object.entries(options.where)) {
@@ -55,7 +55,7 @@ export function GenerateQuery<T extends object>(
 			break;
 		}
 		case QueryType.DELETE: {
-			query = `DELETE FROM ${table}`;
+			query = `DELETE FROM ${tableName}`;
 			if (options.where) {
 				const whereStmt = [];
 				for (const [key, value] of Object.entries(options.where)) {
@@ -67,7 +67,7 @@ export function GenerateQuery<T extends object>(
 			break;
 		}
 		case QueryType.INSERT: {
-			query = `INSERT INTO ${table}`;
+			query = `INSERT INTO ${tableName}`;
 			if (typeof options.data !== "object") {
 				throw new Error("Must provide data to insert");
 			}
@@ -83,7 +83,7 @@ export function GenerateQuery<T extends object>(
 			break;
 		}
 		case QueryType.UPDATE: {
-			query = `UPDATE ${table}`;
+			query = `UPDATE ${tableName}`;
 			if (typeof options.data !== "object") {
 				throw new Error("Must provide data to update");
 			}
