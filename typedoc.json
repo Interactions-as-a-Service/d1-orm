@@ -45,10 +45,6 @@
 			{
 				"title": "Upserting",
 				"source": "./guides/upserting.md"
-			},
-			{
-				"title": "404",
-				"source": "./guides/404.md"
 			}
 		],
 		"source": "",
