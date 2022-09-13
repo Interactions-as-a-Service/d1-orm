@@ -153,7 +153,7 @@ export class Model<T extends object> {
 	 * @returns Returns all rows that match the where clause.
 	 */
 	public async All(
-		options: Omit<GenerateQueryOptions<T>, "data">
+		options: Omit<GenerateQueryOptions<T>, "data" | "upsertOnlyUpdateData">
 	): Promise<D1Result<T[]>> {
 		const statement = GenerateQuery(QueryType.SELECT, this.tableName, options);
 		return this.#D1Orm
