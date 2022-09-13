@@ -99,4 +99,62 @@ const users = await users.All({
 
 This will return the first 10 users with a name of "John Doe", ordered by ID, equivalent to `SELECT * FROM users WHERE name = "John Doe" ORDER BY "id" LIMIT 10 OFFSET 0`.
 
-TODO: InsertOne, InsertMany, Update, Delete
+### Inserting Data
+
+There are two methods used to insert data into the database. The first is {@link Model.InsertOne}, which will insert a single row, and the second is {@link Model.InsertMany}, which will insert multiple rows.
+
+#### InsertOne()
+
+This method takes just one parameter, which is the data to insert. This should be an object with a key of the column name, and a value of the value to insert. For example:
+
+```ts
+await users.InsertOne({
+	name: "John Doe",
+	email: "john-doe@gmail.com",
+});
+```
+
+This will insert a new user with a name of "John Doe" and an email of "john-doe@gmail.com". This is equivalent to `INSERT INTO users (name, email) VALUES ("John Doe", "john-doe@gmail.com")`.
+
+#### InsertMany()
+
+This method takes just one parameter, which is an array of data to insert. This should be an array of objects with a key of the column name, and a value of the value to insert. For example:
+
+```ts
+await users.InsertMany([
+	{
+		name: "John Doe",
+		email: "john-doe@gmail.com",
+	},
+	{
+		name: "Jane Doe",
+		email: "jane-doe@gmail.com",
+	},
+]);
+```
+
+This will insert two new users into our table. This uses D1's Batched statements, where an array of statements is sent to the database in a single request.
+
+### Deleting Data
+
+To remove data from your table, you simply call the Delete() method. This has one parameter, an object, with a `where` property. This is used to filter the rows to delete. See [Query Building](/guides/query-building) for more information on how to use the `where` property.
+
+```ts
+await users.Delete({ where: { name: "John Doe" } });
+```
+
+This is equivalent to `DELETE FROM users WHERE name = "John Doe"`.
+
+### Updating Data
+
+To update data in your table, you simply call the Update() method. This has two parameters, the first is an object with a `where` property. This is used to filter the rows to update. See [Query Building](/guides/query-building) for more information on how to use the `where` property. The second parameter is an object with the data to update. This should be an object with a key of the column name, and a value of the value to update.
+
+```ts
+await users.Update({ where: { name: "Jane Doe" } }, { name: "John Doe" });
+```
+
+This is equivalent to `UPDATE users SET name = "Jane Doe" WHERE name = "John Doe"`.
+
+### Upserting Data
+
+See [Upserting Data](/guides/upserting).
