@@ -141,7 +141,11 @@ export class Model<T extends object> {
 	public async First(
 		options: Pick<GenerateQueryOptions<T>, "where">
 	): Promise<D1Result<T>> {
-		const statement = GenerateQuery(QueryType.SELECT, this.tableName, options);
+		const statement = GenerateQuery(
+			QueryType.SELECT,
+			this.tableName,
+			Object.assign(options, { limit: 1 })
+		);
 		return this.#D1Orm
 			.prepare(statement.query)
 			.bind(...statement.bindings)
@@ -153,7 +157,7 @@ export class Model<T extends object> {
 	 * @returns Returns all rows that match the where clause.
 	 */
 	public async All(
-		options: Omit<GenerateQueryOptions<T>, "data">
+		options: Omit<GenerateQueryOptions<T>, "data" | "upsertOnlyUpdateData">
 	): Promise<D1Result<T[]>> {
 		const statement = GenerateQuery(QueryType.SELECT, this.tableName, options);
 		return this.#D1Orm
