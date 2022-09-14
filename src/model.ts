@@ -141,7 +141,11 @@ export class Model<T extends object> {
 	public async First(
 		options: Pick<GenerateQueryOptions<T>, "where">
 	): Promise<D1Result<T>> {
-		const statement = GenerateQuery(QueryType.SELECT, this.tableName, options);
+		const statement = GenerateQuery(
+			QueryType.SELECT,
+			this.tableName,
+			Object.assign(options, { limit: 1 })
+		);
 		return this.#D1Orm
 			.prepare(statement.query)
 			.bind(...statement.bindings)
