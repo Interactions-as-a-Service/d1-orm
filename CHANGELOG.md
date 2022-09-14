@@ -1,5 +1,22 @@
 # d1-orm
 
+## 0.2.0
+
+### Minor Changes
+
+- [#21](https://github.com/Interactions-as-a-Service/d1-orm/pull/21) [`b2559ef`](https://github.com/Interactions-as-a-Service/d1-orm/commit/b2559ef2a79ed908b1c5725431af5415490e3201) Thanks [@Skye-31](https://github.com/Skye-31)! - [breaking] feat: Switch to use a QueryBuilder instead of duplicate code in the Model class
+
+  This will be much more expandable in future to support things like advanced where querying, using operators other than AND, joins, etc.
+
+### Patch Changes
+
+- [#26](https://github.com/Interactions-as-a-Service/d1-orm/pull/26) [`bc18cce`](https://github.com/Interactions-as-a-Service/d1-orm/commit/bc18ccea10e332b4d7fa600662cf1358b899c76d) Thanks [@Skye-31](https://github.com/Skye-31)! - Chore: Add a build test
+
+  Also ensure that the lib is built before publishing.
+
+- [#25](https://github.com/Interactions-as-a-Service/d1-orm/pull/25) [`1750a55`](https://github.com/Interactions-as-a-Service/d1-orm/commit/1750a55c77ad6d4fb797cb304309d8b704b271bd) Thanks [@Skye-31](https://github.com/Skye-31)! - Chore: readable guides for interacting with the library
+  Closes #22
+
 ## 0.1.3
 
 ### Patch Changes
