@@ -17,7 +17,7 @@ Now we need to define the Model structure.
 ```ts
 import { D1Orm, DataTypes, Model } from "d1-orm";
 
-// We must initialise an ORM to use the Model class. This is done by passing in a D1Database instance.
+// We must initialise an ORM to use the Model class. This is done by passing in a D1Database instance (in this case it's bound to the `env.DB` environment variable).
 const orm = new D1Orm(env.DB);
 
 // Now, to create the model:
@@ -55,18 +55,20 @@ Both arguments are required. The first argument is the model options, and the se
 The next step is to create the table in the database. This is done by calling the {@link Model.CreateTable} method on the model. There are two strategies for this:
 
 - default: This will attempt to create the table, and error if it already exists.
-- force: This will drop the table if it already exists, and then recreate it. Warning: This will delete all data in the table.
+- force: This will drop and recreate the table. Warning: This will delete all data in the table!
 
 To use it, it's as simple as
 
 ```ts
-await users.CreateTable({ strategy: "default" /* or "force" */ });
+await users.CreateTable({ strategy: "default" /* or "force", see above */ });
 ```
 
 This will either return successfully or throw an error that your table already exists.
 
 It's not recommended to use the force strategy in production, but it's useful for development.
-You additionally shouldn't call this method on each worker request, as it's an expensive operation. Instead, you should call it once when you deploy your worker.
+You shouldn't call this method on each worker request: it's very expensive and may take some time. Instead, it should be called when you deploy your Worker.
+
+Alternatively, you can create your tables manually via the [`wrangler CLI`](https://developers.cloudflare.com/workers/wrangler/) and avoid using this method altogether.
 
 That's it! You've now created a model. You can now use the model to query the database.
 
