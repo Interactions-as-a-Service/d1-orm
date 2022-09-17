@@ -16,7 +16,8 @@
 			"Partial": "https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype",
 			"Pick": "https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys",
 			"Record": "https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type",
-			"Omit": "https://www.typescriptlang.org/docs/handbook/utility-types.html#omittype-keys"
+			"Omit": "https://www.typescriptlang.org/docs/handbook/utility-types.html#omittype-keys",
+			"Extract": "https://www.typescriptlang.org/docs/handbook/utility-types.html#extracttype-union"
 		}
 	},
 	"githubPages": false,
