@@ -19,7 +19,7 @@ export class Model<T extends object> {
 			D1Orm: D1Orm;
 			tableName: string;
 		},
-		columns: Record<string, ModelColumn>
+		columns: Record<Extract<keyof T, string>, ModelColumn>
 	) {
 		this.#D1Orm = options.D1Orm;
 		this.tableName = options.tableName;
