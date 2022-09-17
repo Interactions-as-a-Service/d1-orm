@@ -1,5 +1,11 @@
 # d1-orm
 
+## 0.2.1
+
+### Patch Changes
+
+- [#27](https://github.com/Interactions-as-a-Service/d1-orm/pull/27) [`1e8e4e5`](https://github.com/Interactions-as-a-Service/d1-orm/commit/1e8e4e54d948d6eac4aff13b24676926fd5f7dce) Thanks [@Skye-31](https://github.com/Skye-31)! - Chore: Make Model#constructor#columns use the provided type of the model, rather than any keys
+
 ## 0.2.0
 
 ### Minor Changes
