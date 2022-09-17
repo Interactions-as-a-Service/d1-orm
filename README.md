@@ -8,7 +8,7 @@ Docs can be found at https://d1-orm.pages.dev/guides
 
 ## Installation
 
-This package can be [found on NPM](npmjs.com/package/d1-orm)
+This package can be [found on NPM](https://npmjs.com/package/d1-orm)
 
 ```sh
 $ npm install d1-orm
