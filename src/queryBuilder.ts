@@ -182,11 +182,15 @@ export function GenerateQuery<T extends object>(
 	};
 }
 
-function transformOrderBy<T extends object>(
+/**
+ * @private
+ * @hidden
+ */
+export function transformOrderBy<T extends object>(
 	orderBy: OrderBy<T> | OrderBy<T>[]
 ): string {
 	if (Array.isArray(orderBy)) {
-		return orderBy.map((o) => transformOrderBy(o)).join(", ");
+		return orderBy.map(transformOrderBy).join(", ");
 	}
 	if (
 		typeof orderBy === "string" ||

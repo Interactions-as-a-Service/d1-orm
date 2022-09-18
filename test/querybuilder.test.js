@@ -1,5 +1,9 @@
 import { expect } from "chai";
-import { GenerateQuery, QueryType } from "../lib/queryBuilder.js";
+import {
+	GenerateQuery,
+	QueryType,
+	transformOrderBy,
+} from "../lib/queryBuilder.js";
 
 describe("Query Builder", () => {
 	describe("Validation of options", () => {
@@ -299,6 +303,48 @@ describe("Query Builder", () => {
 				expect(statement.bindings[3]).to.equal("test");
 				expect(statement.bindings[4]).to.equal(1);
 			});
+		});
+	});
+	describe("Ordering", () => {
+		it("should not transform a single string", () => {
+			expect(transformOrderBy("test")).to.equal(`"test"`);
+		});
+		it("should transform an array of strings", () => {
+			expect(transformOrderBy(["test", "test2"])).to.equal(`"test", "test2"`);
+		});
+		it("should transform an object", () => {
+			expect(transformOrderBy({ column: "id" })).to.equal(`"id"`);
+			expect(transformOrderBy({ column: "id", descending: true })).to.equal(
+				`"id" DESC`
+			);
+			expect(
+				transformOrderBy({ column: "id", descending: true, nullLast: true })
+			).to.equal(`"id" DESC NULLS LAST`);
+		});
+		it("should transform an array of objects", () => {
+			expect(transformOrderBy([{ column: "id" }, { column: "id2" }])).to.equal(
+				`"id", "id2"`
+			);
+			expect(
+				transformOrderBy([
+					{ column: "id", descending: true },
+					{ column: "id2" },
+				])
+			).to.equal(`"id" DESC, "id2"`);
+			expect(
+				transformOrderBy([
+					{ column: "id", descending: true, nullLast: true },
+					{ column: "id2" },
+				])
+			).to.equal(`"id" DESC NULLS LAST, "id2"`);
+		});
+		it("should mix and match strings and objects", () => {
+			expect(
+				transformOrderBy([
+					{ column: "id", descending: true, nullLast: true },
+					"id2",
+				])
+			).to.equal(`"id" DESC NULLS LAST, "id2"`);
 		});
 	});
 });
