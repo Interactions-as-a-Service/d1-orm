@@ -140,7 +140,7 @@ export class Model<T extends object> {
 	 */
 	public async First(
 		options: Pick<GenerateQueryOptions<T>, "where">
-	): Promise<D1Result<T>> {
+	): Promise<T> {
 		const statement = GenerateQuery(
 			QueryType.SELECT,
 			this.tableName,
