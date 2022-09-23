@@ -1,5 +1,11 @@
 # d1-orm
 
+## 0.2.2
+
+### Patch Changes
+
+- [`b0088b2`](https://github.com/Interactions-as-a-Service/d1-orm/commit/b0088b2884889e86fe871c965be5e154c3af2d99) Thanks [@Skye-31](https://github.com/Skye-31)! - Fix types for Model.First() (should return T, not D1Result<T>)
+
 ## 0.2.1
 
 ### Patch Changes
