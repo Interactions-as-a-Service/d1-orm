@@ -39,12 +39,21 @@ export class Model<T extends object> {
 			throw new Error("Model columns cannot be empty");
 		}
 
+		let hasAutoIncrement = false;
 		for (const [columnName, column] of columnEntries) {
-			if (column.autoIncrement && column.type !== DataTypes.INTEGER) {
-				throw new Error(
-					`Column "${columnName}" is autoincrement but is not an integer`
-				);
+			if (column.autoIncrement) {
+				if (column.type !== DataTypes.INTEGER) {
+					throw new Error(
+						`Column "${columnName}" is autoincrement but is not an integer`
+					);
+				}
+				hasAutoIncrement = true;
 			}
+		}
+		if (hasAutoIncrement && this.#primaryKeys.length > 1) {
+			throw new Error(
+				"Model cannot have more than 1 primary key if autoIncrement is true"
+			);
 		}
 		if (!this.#primaryKeys.length) {
 			throw new Error("Model must have a primary key");
@@ -124,7 +133,7 @@ export class Model<T extends object> {
 	 * @param data The data to insert into the table, as an object with the column names as keys and the values as values.
 	 */
 	public async InsertOne(data: Partial<T>): Promise<D1Result<T>> {
-		const statement = GenerateQuery(QueryType.INSERT, this.tableName, data);
+		const statement = GenerateQuery(QueryType.INSERT, this.tableName, { data });
 		return this.#D1Orm
 			.prepare(statement.query)
 			.bind(...statement.bindings)
@@ -137,7 +146,9 @@ export class Model<T extends object> {
 	public async InsertMany(data: Partial<T>[]): Promise<D1Result<T>[]> {
 		const stmts: D1PreparedStatement[] = [];
 		for (const row of data) {
-			const stmt = GenerateQuery(QueryType.INSERT, this.tableName, row);
+			const stmt = GenerateQuery(QueryType.INSERT, this.tableName, {
+				data: row,
+			});
 			stmts.push(this.#D1Orm.prepare(stmt.query).bind(...stmt.bindings));
 		}
 		return this.#D1Orm.batch<T>(stmts);

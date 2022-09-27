@@ -71,6 +71,25 @@ describe("Model Validation", () => {
 					)
 			).to.not.throw();
 		});
+		it("should throw an error if 2 primary keys and autoincrement is true", () => {
+			expect(
+				() =>
+					new Model(
+						{ D1Orm: orm, tableName: "test" },
+						{
+							id: { type: DataTypes.INTEGER, primaryKey: true },
+							id2: {
+								type: DataTypes.INTEGER,
+								primaryKey: true,
+								autoIncrement: true,
+							},
+						}
+					)
+			).to.throw(
+				Error,
+				"Model cannot have more than 1 primary key if autoIncrement is true"
+			);
+		});
 	});
 });
 
@@ -92,12 +111,12 @@ describe("Model > Create Tables", () => {
 		const model = new Model(
 			{ D1Orm: orm, tableName: "test" },
 			{
-				id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+				id: { type: DataTypes.INTEGER, primaryKey: true },
 				name: { type: DataTypes.STRING, primaryKey: true },
 			}
 		);
 		expect(model.createTableDefinition).to.equal(
-			"CREATE TABLE `test` (id integer AUTOINCREMENT, name text, PRIMARY KEY (id, name));"
+			"CREATE TABLE `test` (id integer, name text, PRIMARY KEY (id, name));"
 		);
 	});
 	it("should support a not null constraint", () => {
