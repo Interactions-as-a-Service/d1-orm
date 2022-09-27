@@ -76,7 +76,7 @@ export function GenerateQuery<T extends object>(
 					whereStmt.push(`${key} = ?`);
 					bindings.push(value);
 				}
-				query += ` WHERE ${whereStmt.join(" AND ")}`;
+				if (whereStmt.length) query += ` WHERE ${whereStmt.join(" AND ")}`;
 			}
 			if (options.orderBy) {
 				query += " ORDER BY " + transformOrderBy(options.orderBy);
@@ -97,7 +97,7 @@ export function GenerateQuery<T extends object>(
 					whereStmt.push(`${key} = ?`);
 					bindings.push(value);
 				}
-				query += ` WHERE ${whereStmt.join(" AND ")}`;
+				if (whereStmt.length) query += ` WHERE ${whereStmt.join(" AND ")}`;
 			}
 			break;
 		}
@@ -140,7 +140,7 @@ export function GenerateQuery<T extends object>(
 					whereStmt.push(`${key} = ?`);
 					bindings.push(value);
 				}
-				query += ` WHERE ${whereStmt.join(" AND ")}`;
+				if (whereStmt.length) query += ` WHERE ${whereStmt.join(" AND ")}`;
 			}
 			break;
 		}
