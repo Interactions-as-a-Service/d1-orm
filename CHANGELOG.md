@@ -1,5 +1,15 @@
 # d1-orm
 
+## 0.3.0
+
+### Minor Changes
+
+- [#36](https://github.com/Interactions-as-a-Service/d1-orm/pull/36) [`9ac7269`](https://github.com/Interactions-as-a-Service/d1-orm/commit/9ac726959774d1a577048ccd7404f1c28c50fa93) Thanks [@Skye-31](https://github.com/Skye-31)! - Feat: Composite primary keys
+
+### Patch Changes
+
+- [#34](https://github.com/Interactions-as-a-Service/d1-orm/pull/34) [`f19fbb2`](https://github.com/Interactions-as-a-Service/d1-orm/commit/f19fbb231671d0185f8a42e49a2c86ada99b2feb) Thanks [@Skye-31](https://github.com/Skye-31)! - fix: don't include empty where objects when querying
+
 ## 0.2.2
 
 ### Patch Changes
