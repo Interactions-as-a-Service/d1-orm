@@ -3,13 +3,14 @@ import { D1Orm } from "../lib/database.js";
 import { DataTypes } from "../lib/datatypes.js";
 import { Model } from "../lib/model.js";
 
+const fakeD1Database = {
+	prepare: () => {},
+	dump: () => {},
+	batch: () => {},
+	exec: () => {},
+};
+
 describe("Model Validation", () => {
-	const fakeD1Database = {
-		prepare: () => {},
-		dump: () => {},
-		batch: () => {},
-		exec: () => {},
-	};
 	const orm = new D1Orm(fakeD1Database);
 	describe("it should throw if the model has invalid options", () => {
 		it("should throw if an invalid D1Orm is provided", () => {
@@ -56,9 +57,9 @@ describe("Model Validation", () => {
 							id: { type: DataTypes.INTEGER },
 						}
 					)
-			).to.throw(Error, "Model must have 1 primary key, got: 0");
+			).to.throw(Error, "Model must have a primary key");
 		});
-		it("should throw an error if there is more than 1 primary key", () => {
+		it("should not throw an error if there is more than 1 primary key", () => {
 			expect(
 				() =>
 					new Model(
@@ -68,7 +69,90 @@ describe("Model Validation", () => {
 							id2: { type: DataTypes.INTEGER, primaryKey: true },
 						}
 					)
-			).to.throw(Error, "Model must have 1 primary key, got: 2");
+			).to.not.throw();
 		});
+		it("should throw an error if 2 primary keys and autoincrement is true", () => {
+			expect(
+				() =>
+					new Model(
+						{ D1Orm: orm, tableName: "test" },
+						{
+							id: { type: DataTypes.INTEGER, primaryKey: true },
+							id2: {
+								type: DataTypes.INTEGER,
+								primaryKey: true,
+								autoIncrement: true,
+							},
+						}
+					)
+			).to.throw(
+				Error,
+				"Model cannot have more than 1 primary key if autoIncrement is true"
+			);
+		});
+	});
+});
+
+describe("Model > Create Tables", () => {
+	const orm = new D1Orm(fakeD1Database);
+	it("should return a create table statement", () => {
+		const model = new Model(
+			{ D1Orm: orm, tableName: "test" },
+			{
+				id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+				name: { type: DataTypes.STRING },
+			}
+		);
+		expect(model.createTableDefinition).to.equal(
+			"CREATE TABLE `test` (id integer AUTOINCREMENT, name text, PRIMARY KEY (id));"
+		);
+	});
+	it("should return a create table statement with multiple primary keys", () => {
+		const model = new Model(
+			{ D1Orm: orm, tableName: "test" },
+			{
+				id: { type: DataTypes.INTEGER, primaryKey: true },
+				name: { type: DataTypes.STRING, primaryKey: true },
+			}
+		);
+		expect(model.createTableDefinition).to.equal(
+			"CREATE TABLE `test` (id integer, name text, PRIMARY KEY (id, name));"
+		);
+	});
+	it("should support a not null constraint", () => {
+		const model = new Model(
+			{ D1Orm: orm, tableName: "test" },
+			{
+				id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+				name: { type: DataTypes.STRING, notNull: true },
+			}
+		);
+		expect(model.createTableDefinition).to.equal(
+			"CREATE TABLE `test` (id integer AUTOINCREMENT, name text NOT NULL, PRIMARY KEY (id));"
+		);
+	});
+	it("should support a unique constraint", () => {
+		const model = new Model(
+			{ D1Orm: orm, tableName: "test" },
+			{
+				id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+				name: { type: DataTypes.STRING, unique: true },
+			}
+		);
+		expect(model.createTableDefinition).to.equal(
+			"CREATE TABLE `test` (id integer AUTOINCREMENT, name text UNIQUE, PRIMARY KEY (id));"
+		);
+	});
+	it("should support a default value", () => {
+		const model = new Model(
+			{ D1Orm: orm, tableName: "test" },
+			{
+				id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+				name: { type: DataTypes.STRING, defaultValue: "test" },
+			}
+		);
+		expect(model.createTableDefinition).to.equal(
+			'CREATE TABLE `test` (id integer AUTOINCREMENT, name text DEFAULT "test", PRIMARY KEY (id));'
+		);
 	});
 });

@@ -39,20 +39,60 @@ export class Model<T extends object> {
 			throw new Error("Model columns cannot be empty");
 		}
 
+		let hasAutoIncrement = false;
 		for (const [columnName, column] of columnEntries) {
-			if (column.autoIncrement && column.type !== DataTypes.INTEGER) {
-				throw new Error(
-					`Column "${columnName}" is autoincrement but is not an integer`
-				);
+			if (column.autoIncrement) {
+				if (column.type !== DataTypes.INTEGER) {
+					throw new Error(
+						`Column "${columnName}" is autoincrement but is not an integer`
+					);
+				}
+				hasAutoIncrement = true;
 			}
 		}
-
-		// This is done so the getter checks if the model has a primary key, and throws an error if not
-		this.#primaryKey;
+		if (hasAutoIncrement && this.#primaryKeys.length > 1) {
+			throw new Error(
+				"Model cannot have more than 1 primary key if autoIncrement is true"
+			);
+		}
+		if (!this.#primaryKeys.length) {
+			throw new Error("Model must have a primary key");
+		}
 	}
 	public tableName: string;
 	public readonly columns: Record<string, ModelColumn>;
 	readonly #D1Orm: D1Orm;
+
+	get #primaryKeys(): string[] {
+		return Object.keys(this.columns).filter((x) => this.columns[x].primaryKey);
+	}
+
+	/**
+	 * @returns A CreateTable definition for the model, which can be used in a CREATE TABLE statement.
+	 */
+	get createTableDefinition(): string {
+		const columnEntries = Object.entries(this.columns);
+		const columnDefinition = columnEntries.map(([columnName, column]) => {
+			let definition = `${columnName} ${column.type}`;
+			if (column.autoIncrement) {
+				definition += " AUTOINCREMENT";
+			}
+			if (column.notNull) {
+				definition += " NOT NULL";
+			}
+			if (column.unique) {
+				definition += " UNIQUE";
+			}
+			if (column.defaultValue !== undefined) {
+				definition += ` DEFAULT "${column.defaultValue}"`;
+			}
+			return definition;
+		});
+		columnDefinition.push(`PRIMARY KEY (${this.#primaryKeys.join(", ")})`);
+		return `CREATE TABLE \`${this.tableName}\` (${columnDefinition.join(
+			", "
+		)});`;
+	}
 
 	/**
 	 * @param options The options for creating the table. Currently only contains strategy, which is the strategy to use when creating the table.
@@ -72,31 +112,9 @@ export class Model<T extends object> {
 		if (strategy === "alter") {
 			throw new Error("Alter strategy is not implemented");
 		}
-		const columnEntries = Object.entries(this.columns);
-		const columnDefinitions = columnEntries
-			.map(([columnName, column]) => {
-				let definition = `${columnName} ${column.type}`;
-				if (column.primaryKey) {
-					definition += " PRIMARY KEY";
-				}
-				if (column.autoIncrement) {
-					definition += " AUTOINCREMENT";
-				}
-				if (column.notNull) {
-					definition += " NOT NULL";
-				}
-				if (column.unique) {
-					definition += " UNIQUE";
-				}
-				if (column.defaultValue) {
-					definition += ` DEFAULT "${column.defaultValue}"`;
-				}
-				return definition;
-			})
-			.join(", ");
-		let statement = `CREATE TABLE ${this.tableName} (${columnDefinitions});`;
+		let statement = this.createTableDefinition;
 		if (strategy === "force") {
-			statement = `DROP TABLE IF EXISTS ${this.tableName}\n${statement}`;
+			statement = `DROP TABLE IF EXISTS \`${this.tableName}\`\n${statement}`;
 		}
 		return this.#D1Orm.exec(statement);
 	}
@@ -115,7 +133,7 @@ export class Model<T extends object> {
 	 * @param data The data to insert into the table, as an object with the column names as keys and the values as values.
 	 */
 	public async InsertOne(data: Partial<T>): Promise<D1Result<T>> {
-		const statement = GenerateQuery(QueryType.INSERT, this.tableName, data);
+		const statement = GenerateQuery(QueryType.INSERT, this.tableName, { data });
 		return this.#D1Orm
 			.prepare(statement.query)
 			.bind(...statement.bindings)
@@ -128,7 +146,9 @@ export class Model<T extends object> {
 	public async InsertMany(data: Partial<T>[]): Promise<D1Result<T>[]> {
 		const stmts: D1PreparedStatement[] = [];
 		for (const row of data) {
-			const stmt = GenerateQuery(QueryType.INSERT, this.tableName, row);
+			const stmt = GenerateQuery(QueryType.INSERT, this.tableName, {
+				data: row,
+			});
 			stmts.push(this.#D1Orm.prepare(stmt.query).bind(...stmt.bindings));
 		}
 		return this.#D1Orm.batch<T>(stmts);
@@ -204,21 +224,16 @@ export class Model<T extends object> {
 			"where" | "data" | "upsertOnlyUpdateData"
 		>
 	) {
-		const statement = GenerateQuery(QueryType.UPSERT, this.tableName, options);
+		const statement = GenerateQuery(
+			QueryType.UPSERT,
+			this.tableName,
+			options,
+			this.#primaryKeys
+		);
 		return this.#D1Orm
 			.prepare(statement.query)
 			.bind(...statement.bindings)
 			.run();
-	}
-
-	get #primaryKey(): string {
-		const keys = Object.keys(this.columns).filter(
-			(key) => this.columns[key].primaryKey
-		);
-		if (keys.length !== 1) {
-			throw new Error(`Model must have 1 primary key, got: ${keys.length}`);
-		}
-		return keys[0];
 	}
 }
 

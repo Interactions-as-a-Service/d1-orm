@@ -310,6 +310,27 @@ describe("Query Builder", () => {
 				expect(statement.bindings[3]).to.equal("test");
 				expect(statement.bindings[4]).to.equal(1);
 			});
+			it("should accept multiple primary keys", () => {
+				const statement = GenerateQuery(
+					QueryType.UPSERT,
+					"test",
+					{
+						data: { id: 1, name: "test" },
+						upsertOnlyUpdateData: { id: 1, name: "test" },
+						where: { id: 1 },
+					},
+					["name", "id"]
+				);
+				expect(statement.query).to.equal(
+					"INSERT INTO `test` (id, name) VALUES (?, ?) ON CONFLICT (name, id) DO UPDATE SET id = ?, name = ? WHERE id = ?"
+				);
+				expect(statement.bindings.length).to.equal(5);
+				expect(statement.bindings[0]).to.equal(1);
+				expect(statement.bindings[1]).to.equal("test");
+				expect(statement.bindings[2]).to.equal(1);
+				expect(statement.bindings[3]).to.equal("test");
+				expect(statement.bindings[4]).to.equal(1);
+			});
 		});
 	});
 	describe("Ordering", () => {
