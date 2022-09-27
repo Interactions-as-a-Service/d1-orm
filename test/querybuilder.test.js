@@ -179,9 +179,9 @@ describe("Query Builder", () => {
 		});
 		describe(QueryType.INSERT_OR_REPLACE, () => {
 			it("should throw an error if no data is provided", () => {
-				expect(() => GenerateQuery(QueryType.INSERT_OR_REPLACE, "test")).to.throw(
-					"Must provide data to insert"
-				);
+				expect(() =>
+					GenerateQuery(QueryType.INSERT_OR_REPLACE, "test")
+				).to.throw("Must provide data to insert");
 			});
 			it("should throw an error if empty data is provided", () => {
 				expect(() =>
@@ -192,7 +192,9 @@ describe("Query Builder", () => {
 				const statement = GenerateQuery(QueryType.INSERT_OR_REPLACE, "test", {
 					data: { id: 1 },
 				});
-				expect(statement.query).to.equal("INSERT or REPLACE INTO `test` (id) VALUES (?)");
+				expect(statement.query).to.equal(
+					"INSERT or REPLACE INTO `test` (id) VALUES (?)"
+				);
 				expect(statement.bindings.length).to.equal(1);
 				expect(statement.bindings[0]).to.equal(1);
 			});

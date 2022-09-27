@@ -140,7 +140,10 @@ export class Model<T extends object> {
 	/**
 	 * @param data The data to insert into the table, as an object with the column names as keys and the values as values.
 	 */
-	public async InsertOne(data: Partial<T>, orReplace = false): Promise<D1Result<T>> {
+	public async InsertOne(
+		data: Partial<T>,
+		orReplace = false
+	): Promise<D1Result<T>> {
 		const qt = orReplace ? QueryType.INSERT_OR_REPLACE : QueryType.INSERT;
 		const statement = GenerateQuery(qt, this.tableName, { data });
 		return this.#D1Orm
@@ -152,7 +155,10 @@ export class Model<T extends object> {
 	/**
 	 * @param data The data to insert into the table, as an array of objects with the column names as keys and the values as values.
 	 */
-	public async InsertMany(data: Partial<T>[], orReplace = false): Promise<D1Result<T>[]> {
+	public async InsertMany(
+		data: Partial<T>[],
+		orReplace = false
+	): Promise<D1Result<T>[]> {
 		const qt = orReplace ? QueryType.INSERT_OR_REPLACE : QueryType.INSERT;
 		const stmts: D1PreparedStatement[] = [];
 		for (const row of data) {
