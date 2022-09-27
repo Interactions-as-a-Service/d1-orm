@@ -56,9 +56,9 @@ describe("Model Validation", () => {
 							id: { type: DataTypes.INTEGER },
 						}
 					)
-			).to.throw(Error, "Model must have 1 primary key, got: 0");
+			).to.throw(Error, "Model must have a primary key");
 		});
-		it("should throw an error if there is more than 1 primary key", () => {
+		it("should not throw an error if there is more than 1 primary key", () => {
 			expect(
 				() =>
 					new Model(
@@ -68,7 +68,7 @@ describe("Model Validation", () => {
 							id2: { type: DataTypes.INTEGER, primaryKey: true },
 						}
 					)
-			).to.throw(Error, "Model must have 1 primary key, got: 2");
+			).to.not.throw();
 		});
 	});
 });

@@ -60,7 +60,7 @@ export function GenerateQuery<T extends object>(
 	type: QueryType,
 	tableName: string,
 	options: GenerateQueryOptions<T> = {},
-	primaryKey = "id"
+	primaryKeys: string | string[] = "id"
 ): { bindings: unknown[]; query: string } {
 	if (typeof tableName !== "string" || !tableName.length) {
 		throw new Error("Invalid table name");
@@ -168,7 +168,11 @@ export function GenerateQuery<T extends object>(
 				.repeat(insertDataKeys.length)
 				.split("")
 				.join(", ")})`;
-			query += ` ON CONFLICT (${primaryKey}) DO UPDATE SET`;
+
+			const primaryKeyStr = Array.isArray(primaryKeys)
+				? primaryKeys.join(", ")
+				: primaryKeys;
+			query += ` ON CONFLICT (${primaryKeyStr}) DO UPDATE SET`;
 			query += ` ${updateDataKeys.map((key) => `${key} = ?`).join(", ")}`;
 			query += ` WHERE ${whereKeys.map((key) => `${key} = ?`).join(" AND ")}`;
 			break;

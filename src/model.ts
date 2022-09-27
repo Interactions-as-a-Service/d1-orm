@@ -46,13 +46,44 @@ export class Model<T extends object> {
 				);
 			}
 		}
-
-		// This is done so the getter checks if the model has a primary key, and throws an error if not
-		this.#primaryKey;
+		if (!this.#primaryKeys.length) {
+			throw new Error("Model must have a primary key");
+		}
 	}
 	public tableName: string;
 	public readonly columns: Record<string, ModelColumn>;
 	readonly #D1Orm: D1Orm;
+
+	get #primaryKeys(): string[] {
+		return Object.keys(this.columns).filter((x) => this.columns[x].primaryKey);
+	}
+
+	/**
+	 * @returns A CreateTable definition for the model, which can be used in a CREATE TABLE statement.
+	 */
+	get createTableDefinition(): string {
+		const columnEntries = Object.entries(this.columns);
+		const columnDefinition = columnEntries.map(([columnName, column]) => {
+			let definition = `${columnName} ${column.type}`;
+			if (column.autoIncrement) {
+				definition += " AUTOINCREMENT";
+			}
+			if (column.notNull) {
+				definition += " NOT NULL";
+			}
+			if (column.unique) {
+				definition += " UNIQUE";
+			}
+			if (column.defaultValue) {
+				definition += ` DEFAULT "${column.defaultValue}"`;
+			}
+			return definition;
+		});
+		columnDefinition.push(`PRIMARY KEY (${this.#primaryKeys.join(", ")})`);
+		return `CREATE TABLE \`${this.tableName}\` (${columnDefinition.join(
+			", "
+		)});`;
+	}
 
 	/**
 	 * @param options The options for creating the table. Currently only contains strategy, which is the strategy to use when creating the table.
@@ -72,31 +103,9 @@ export class Model<T extends object> {
 		if (strategy === "alter") {
 			throw new Error("Alter strategy is not implemented");
 		}
-		const columnEntries = Object.entries(this.columns);
-		const columnDefinitions = columnEntries
-			.map(([columnName, column]) => {
-				let definition = `${columnName} ${column.type}`;
-				if (column.primaryKey) {
-					definition += " PRIMARY KEY";
-				}
-				if (column.autoIncrement) {
-					definition += " AUTOINCREMENT";
-				}
-				if (column.notNull) {
-					definition += " NOT NULL";
-				}
-				if (column.unique) {
-					definition += " UNIQUE";
-				}
-				if (column.defaultValue) {
-					definition += ` DEFAULT "${column.defaultValue}"`;
-				}
-				return definition;
-			})
-			.join(", ");
-		let statement = `CREATE TABLE ${this.tableName} (${columnDefinitions});`;
+		let statement = this.createTableDefinition;
 		if (strategy === "force") {
-			statement = `DROP TABLE IF EXISTS ${this.tableName}\n${statement}`;
+			statement = `DROP TABLE IF EXISTS \`${this.tableName}\`\n${statement}`;
 		}
 		return this.#D1Orm.exec(statement);
 	}
@@ -204,21 +213,16 @@ export class Model<T extends object> {
 			"where" | "data" | "upsertOnlyUpdateData"
 		>
 	) {
-		const statement = GenerateQuery(QueryType.UPSERT, this.tableName, options);
+		const statement = GenerateQuery(
+			QueryType.UPSERT,
+			this.tableName,
+			options,
+			this.#primaryKeys
+		);
 		return this.#D1Orm
 			.prepare(statement.query)
 			.bind(...statement.bindings)
 			.run();
-	}
-
-	get #primaryKey(): string {
-		const keys = Object.keys(this.columns).filter(
-			(key) => this.columns[key].primaryKey
-		);
-		if (keys.length !== 1) {
-			throw new Error(`Model must have 1 primary key, got: ${keys.length}`);
-		}
-		return keys[0];
 	}
 }
 
