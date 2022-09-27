@@ -1,5 +1,11 @@
 # d1-orm
 
+## 0.3.2
+
+### Patch Changes
+
+- [`de7eb7d`](https://github.com/Interactions-as-a-Service/d1-orm/commit/de7eb7d72f875aa4c3baa996c85b530f3e245eeb) Thanks [@Skye-31](https://github.com/Skye-31)! - Chore: Make first() return null on a D1_NORESULTS error, as it's inconsistent with local and remote, and that error is near meaningless.
+
 ## 0.3.1
 
 ### Patch Changes
