@@ -164,20 +164,27 @@ export class Model<T extends object> {
 
 	/**
 	 * @param options The options for the query, see {@link GenerateQueryOptions}
-	 * @returns Returns the first row that matches the where clause.
+	 * @returns Returns the first row that matches the where clause, or null if no rows match.
 	 */
 	public async First(
 		options: Pick<GenerateQueryOptions<T>, "where">
-	): Promise<T> {
+	): Promise<T | null> {
 		const statement = GenerateQuery(
 			QueryType.SELECT,
 			this.tableName,
 			Object.assign(options, { limit: 1 })
 		);
-		return this.#D1Orm
-			.prepare(statement.query)
-			.bind(...statement.bindings)
-			.first();
+		try {
+			return this.#D1Orm
+				.prepare(statement.query)
+				.bind(...statement.bindings)
+				.first();
+		} catch (e) {
+			if ((e as Error).message === "D1_NORESULTS") {
+				return null;
+			}
+			throw e;
+		}
 	}
 
 	/**
