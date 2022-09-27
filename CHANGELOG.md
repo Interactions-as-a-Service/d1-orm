@@ -1,5 +1,11 @@
 # d1-orm
 
+## 0.3.1
+
+### Patch Changes
+
+- [`c59b3d8`](https://github.com/Interactions-as-a-Service/d1-orm/commit/c59b3d8d13e6fcfa9254fdb81ae3b7e8901f3bf2) Thanks [@Skye-31](https://github.com/Skye-31)! - Fix autoincrement table definitions
+
 ## 0.3.0
 
 ### Minor Changes
