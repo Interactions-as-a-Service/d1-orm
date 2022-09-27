@@ -31,7 +31,7 @@ const statement = GenerateQuery(QueryType.SELECT, "users", {
 The GenerateQuery method has 3 key parameters.
 
 - QueryType: This is used for determining the structure of your query. See {@link QueryType}.
-  The available options are `SELECT`, `INSERT`, `UPDATE`, `DELETE` and `UPSERT`. These are all standard SQL, with the exception of `UPSERT`.
+  The available options are `SELECT`, `INSERT`, `INSERT_OR_REPLACE`, `UPDATE`, `DELETE` and `UPSERT`. These are all standard SQL, with the exception of `UPSERT`.
 
 - TableName: This is rather self-explanatory. It's used to determine which table you're operating on. In this case, we choose "users".
 

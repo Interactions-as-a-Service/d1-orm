@@ -103,7 +103,7 @@ This will return the first 10 users with a name of "John Doe", ordered by ID, eq
 
 ### Inserting Data
 
-There are two methods used to insert data into the database. The first is {@link Model.InsertOne}, which will insert a single row, and the second is {@link Model.InsertMany}, which will insert multiple rows.
+There are two methods used to insert data into the database. The first is {@link Model.InsertOne}, which will insert a single row, and the second is {@link Model.InsertMany}, which will insert multiple rows. Both accept an optional boolean parameter instructing the [Query Building](/guides/query-building) to generate `INSERT or REPLACE` instead of just `INSERT`. This mechanism differs from [Upsert](/guides/upserting) by its requirement of only replacing records based on the primary key.
 
 #### InsertOne()
 
