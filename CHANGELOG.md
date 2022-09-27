@@ -1,5 +1,11 @@
 # d1-orm
 
+## 0.3.3
+
+### Patch Changes
+
+- [`efd6352`](https://github.com/Interactions-as-a-Service/d1-orm/commit/efd635290dfed2c5a3ac12893b2f9b2fced16d16) Thanks [@Skye-31](https://github.com/Skye-31)! - Redo changes in 0.3.2
+
 ## 0.3.2
 
 ### Patch Changes
