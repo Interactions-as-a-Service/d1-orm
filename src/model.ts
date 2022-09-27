@@ -47,6 +47,11 @@ export class Model<T extends object> {
 						`Column "${columnName}" is autoincrement but is not an integer`
 					);
 				}
+				if (!column.primaryKey) {
+					throw new Error(
+						`Column "${columnName}" is autoincrement but is not the primary key`
+					);
+				}
 				hasAutoIncrement = true;
 			}
 		}
@@ -72,10 +77,12 @@ export class Model<T extends object> {
 	 */
 	get createTableDefinition(): string {
 		const columnEntries = Object.entries(this.columns);
+		let hasAutoIncrement = false;
 		const columnDefinition = columnEntries.map(([columnName, column]) => {
 			let definition = `${columnName} ${column.type}`;
 			if (column.autoIncrement) {
-				definition += " AUTOINCREMENT";
+				hasAutoIncrement = true;
+				definition += " PRIMARY KEY AUTOINCREMENT";
 			}
 			if (column.notNull) {
 				definition += " NOT NULL";
@@ -88,7 +95,8 @@ export class Model<T extends object> {
 			}
 			return definition;
 		});
-		columnDefinition.push(`PRIMARY KEY (${this.#primaryKeys.join(", ")})`);
+		if (!hasAutoIncrement)
+			columnDefinition.push(`PRIMARY KEY (${this.#primaryKeys.join(", ")})`);
 		return `CREATE TABLE \`${this.tableName}\` (${columnDefinition.join(
 			", "
 		)});`;

@@ -104,7 +104,7 @@ describe("Model > Create Tables", () => {
 			}
 		);
 		expect(model.createTableDefinition).to.equal(
-			"CREATE TABLE `test` (id integer AUTOINCREMENT, name text, PRIMARY KEY (id));"
+			"CREATE TABLE `test` (id integer PRIMARY KEY AUTOINCREMENT, name text);"
 		);
 	});
 	it("should return a create table statement with multiple primary keys", () => {
@@ -123,36 +123,36 @@ describe("Model > Create Tables", () => {
 		const model = new Model(
 			{ D1Orm: orm, tableName: "test" },
 			{
-				id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+				id: { type: DataTypes.INTEGER, primaryKey: true },
 				name: { type: DataTypes.STRING, notNull: true },
 			}
 		);
 		expect(model.createTableDefinition).to.equal(
-			"CREATE TABLE `test` (id integer AUTOINCREMENT, name text NOT NULL, PRIMARY KEY (id));"
+			"CREATE TABLE `test` (id integer, name text NOT NULL, PRIMARY KEY (id));"
 		);
 	});
 	it("should support a unique constraint", () => {
 		const model = new Model(
 			{ D1Orm: orm, tableName: "test" },
 			{
-				id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+				id: { type: DataTypes.INTEGER, primaryKey: true },
 				name: { type: DataTypes.STRING, unique: true },
 			}
 		);
 		expect(model.createTableDefinition).to.equal(
-			"CREATE TABLE `test` (id integer AUTOINCREMENT, name text UNIQUE, PRIMARY KEY (id));"
+			"CREATE TABLE `test` (id integer, name text UNIQUE, PRIMARY KEY (id));"
 		);
 	});
 	it("should support a default value", () => {
 		const model = new Model(
 			{ D1Orm: orm, tableName: "test" },
 			{
-				id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+				id: { type: DataTypes.INTEGER, primaryKey: true },
 				name: { type: DataTypes.STRING, defaultValue: "test" },
 			}
 		);
 		expect(model.createTableDefinition).to.equal(
-			'CREATE TABLE `test` (id integer AUTOINCREMENT, name text DEFAULT "test", PRIMARY KEY (id));'
+			'CREATE TABLE `test` (id integer, name text DEFAULT "test", PRIMARY KEY (id));'
 		);
 	});
 });
