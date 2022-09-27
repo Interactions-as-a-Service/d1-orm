@@ -175,7 +175,7 @@ export class Model<T extends object> {
 			Object.assign(options, { limit: 1 })
 		);
 		try {
-			return this.#D1Orm
+			return await this.#D1Orm
 				.prepare(statement.query)
 				.bind(...statement.bindings)
 				.first();
