@@ -112,6 +112,13 @@ describe("Query Builder", () => {
 				expect(statement.bindings[0]).to.equal(1);
 				expect(statement.bindings[1]).to.equal("test");
 			});
+			it("should ignore an empty where clause object", () => {
+				const statement = GenerateQuery(QueryType.SELECT, "test", {
+					where: {},
+				});
+				expect(statement.query).to.equal("SELECT * FROM `test`");
+				expect(statement.bindings).to.be.empty;
+			});
 		});
 		describe(QueryType.DELETE, () => {
 			it("should generate a basic query", () => {
