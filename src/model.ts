@@ -74,7 +74,7 @@ export class Model<T extends object> {
 			if (column.unique) {
 				definition += " UNIQUE";
 			}
-			if (column.defaultValue) {
+			if (column.defaultValue !== undefined) {
 				definition += ` DEFAULT "${column.defaultValue}"`;
 			}
 			return definition;
