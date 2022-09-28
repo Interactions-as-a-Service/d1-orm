@@ -1,5 +1,11 @@
 # d1-orm
 
+## 0.4.0
+
+### Minor Changes
+
+- [#41](https://github.com/Interactions-as-a-Service/d1-orm/pull/41) [`f8ca119`](https://github.com/Interactions-as-a-Service/d1-orm/commit/f8ca119c0925fe3c813bfce832299129ae99d591) Thanks [@kingmesal](https://github.com/kingmesal)! - Adding insert or replace
+
 ## 0.3.3
 
 ### Patch Changes
