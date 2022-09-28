@@ -4,6 +4,7 @@
 export enum QueryType {
 	SELECT = "SELECT",
 	INSERT = "INSERT",
+	INSERT_OR_REPLACE = "INSERT or REPLACE",
 	UPDATE = "UPDATE",
 	DELETE = "DELETE",
 	UPSERT = "UPSERT",
@@ -101,8 +102,9 @@ export function GenerateQuery<T extends object>(
 			}
 			break;
 		}
+		case QueryType.INSERT_OR_REPLACE:
 		case QueryType.INSERT: {
-			query = `INSERT INTO \`${tableName}\``;
+			query = `${type} INTO \`${tableName}\``;
 			if (
 				typeof options.data !== "object" ||
 				Object.getOwnPropertyNames(options.data).length === 0
