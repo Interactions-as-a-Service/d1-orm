@@ -1,9 +1,28 @@
 import { expect } from "chai";
+import { D1Orm } from "../lib/database.js";
+import { DataTypes } from "../lib/datatypes.js";
+import { Model } from "../lib/model.js";
 import {
 	GenerateQuery,
 	QueryType,
 	transformOrderBy,
 } from "../lib/queryBuilder.js";
+
+
+const fakeD1Database = {
+	prepare: () => {},
+	dump: () => {},
+	batch: () => {},
+	exec: () => {},
+};
+const model = new Model(
+	{ D1Orm: new D1Orm(fakeD1Database), tableName: "test" },
+	{
+		id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+		name: { type: DataTypes.STRING },
+		flag: { type: DataTypes.BOOLEAN },
+	}
+);
 
 describe("Query Builder", () => {
 	describe("Validation of options", () => {
@@ -15,7 +34,7 @@ describe("Query Builder", () => {
 			);
 		});
 		it("should throw an error if query type is invalid", () => {
-			expect(() => GenerateQuery("INVALID", "test", () => {})).to.throw(
+			expect(() => GenerateQuery("INVALID", "test", model, () => {})).to.throw(
 				Error,
 				"Invalid QueryType provided"
 			);
@@ -29,12 +48,12 @@ describe("Query Builder", () => {
 	describe("Query Generation", () => {
 		describe(QueryType.SELECT, () => {
 			it("should generate a basic query", () => {
-				const statement = GenerateQuery(QueryType.SELECT, "test");
+				const statement = GenerateQuery(QueryType.SELECT, "test", model);
 				expect(statement.query).to.equal("SELECT * FROM `test`");
 				expect(statement.bindings).to.be.empty;
 			});
 			it("should generate a query with a where clause", () => {
-				const statement = GenerateQuery(QueryType.SELECT, "test", {
+				const statement = GenerateQuery(QueryType.SELECT, "test", model, {
 					where: { id: 1 },
 				});
 				expect(statement.query).to.equal("SELECT * FROM `test` WHERE id = ?");
@@ -42,7 +61,7 @@ describe("Query Builder", () => {
 				expect(statement.bindings[0]).to.equal(1);
 			});
 			it("should generate a query with a where clause with multiple conditions", () => {
-				const statement = GenerateQuery(QueryType.SELECT, "test", {
+				const statement = GenerateQuery(QueryType.SELECT, "test", model, {
 					where: { id: 1, name: "test" },
 				});
 				expect(statement.query).to.equal(
@@ -53,14 +72,14 @@ describe("Query Builder", () => {
 				expect(statement.bindings[1]).to.equal("test");
 			});
 			it("should generate a query with a limit", () => {
-				const statement = GenerateQuery(QueryType.SELECT, "test", {
+				const statement = GenerateQuery(QueryType.SELECT, "test", model, {
 					limit: 10,
 				});
 				expect(statement.query).to.equal("SELECT * FROM `test` LIMIT 10");
 				expect(statement.bindings).to.be.empty;
 			});
 			it("should generate a query with a limit and offset", () => {
-				const statement = GenerateQuery(QueryType.SELECT, "test", {
+				const statement = GenerateQuery(QueryType.SELECT, "test", model, {
 					limit: 10,
 					offset: 5,
 				});
@@ -70,7 +89,7 @@ describe("Query Builder", () => {
 				expect(statement.bindings).to.be.empty;
 			});
 			it("should generate a query with a limit and offset and order", () => {
-				const statement = GenerateQuery(QueryType.SELECT, "test", {
+				const statement = GenerateQuery(QueryType.SELECT, "test", model, {
 					limit: 10,
 					offset: 5,
 					orderBy: "id",
@@ -81,7 +100,7 @@ describe("Query Builder", () => {
 				expect(statement.bindings).to.be.empty;
 			});
 			it("should accept orderBy as an object", () => {
-				const statement = GenerateQuery(QueryType.SELECT, "test", {
+				const statement = GenerateQuery(QueryType.SELECT, "test", model, {
 					orderBy: { column: "id", descending: true, nullLast: true },
 				});
 				expect(statement.query).to.equal(
@@ -90,7 +109,7 @@ describe("Query Builder", () => {
 				expect(statement.bindings).to.be.empty;
 			});
 			it("should accept orderBy as an array", () => {
-				const statement = GenerateQuery(QueryType.SELECT, "test", {
+				const statement = GenerateQuery(QueryType.SELECT, "test", model, {
 					orderBy: [{ column: "id", descending: true, nullLast: true }, "name"],
 				});
 				expect(statement.query).to.equal(
@@ -99,7 +118,7 @@ describe("Query Builder", () => {
 				expect(statement.bindings).to.be.empty;
 			});
 			it("should generate a query with a where clause with multiple conditions and a limit and offset and order", () => {
-				const statement = GenerateQuery(QueryType.SELECT, "test", {
+				const statement = GenerateQuery(QueryType.SELECT, "test", model, {
 					where: { id: 1, name: "test" },
 					limit: 10,
 					offset: 5,
@@ -113,7 +132,7 @@ describe("Query Builder", () => {
 				expect(statement.bindings[1]).to.equal("test");
 			});
 			it("should ignore an empty where clause object", () => {
-				const statement = GenerateQuery(QueryType.SELECT, "test", {
+				const statement = GenerateQuery(QueryType.SELECT, "test", model, {
 					where: {},
 				});
 				expect(statement.query).to.equal("SELECT * FROM `test`");
@@ -122,12 +141,12 @@ describe("Query Builder", () => {
 		});
 		describe(QueryType.DELETE, () => {
 			it("should generate a basic query", () => {
-				const statement = GenerateQuery(QueryType.DELETE, "test");
+				const statement = GenerateQuery(QueryType.DELETE, "test", model);
 				expect(statement.query).to.equal("DELETE FROM `test`");
 				expect(statement.bindings).to.be.empty;
 			});
 			it("should generate a query with a where clause", () => {
-				const statement = GenerateQuery(QueryType.DELETE, "test", {
+				const statement = GenerateQuery(QueryType.DELETE, "test", model, {
 					where: { id: 1 },
 				});
 				expect(statement.query).to.equal("DELETE FROM `test` WHERE id = ?");
@@ -135,7 +154,7 @@ describe("Query Builder", () => {
 				expect(statement.bindings[0]).to.equal(1);
 			});
 			it("should generate a query with a where clause with multiple conditions", () => {
-				const statement = GenerateQuery(QueryType.DELETE, "test", {
+				const statement = GenerateQuery(QueryType.DELETE, "test", model, {
 					where: { id: 1, name: "test" },
 				});
 				expect(statement.query).to.equal(
@@ -148,17 +167,17 @@ describe("Query Builder", () => {
 		});
 		describe(QueryType.INSERT, () => {
 			it("should throw an error if no data is provided", () => {
-				expect(() => GenerateQuery(QueryType.INSERT, "test")).to.throw(
+				expect(() => GenerateQuery(QueryType.INSERT, "test", model)).to.throw(
 					"Must provide data to insert"
 				);
 			});
 			it("should throw an error if empty data is provided", () => {
 				expect(() =>
-					GenerateQuery(QueryType.INSERT, "test", { data: {} })
+					GenerateQuery(QueryType.INSERT, "test", model, { data: {} })
 				).to.throw("Must provide data to insert");
 			});
 			it("should generate a basic query", () => {
-				const statement = GenerateQuery(QueryType.INSERT, "test", {
+				const statement = GenerateQuery(QueryType.INSERT, "test", model, {
 					data: { id: 1 },
 				});
 				expect(statement.query).to.equal("INSERT INTO `test` (id) VALUES (?)");
@@ -166,7 +185,7 @@ describe("Query Builder", () => {
 				expect(statement.bindings[0]).to.equal(1);
 			});
 			it("should generate a query with multiple columns", () => {
-				const statement = GenerateQuery(QueryType.INSERT, "test", {
+				const statement = GenerateQuery(QueryType.INSERT, "test", model, {
 					data: { id: 1, name: "test" },
 				});
 				expect(statement.query).to.equal(
@@ -176,20 +195,32 @@ describe("Query Builder", () => {
 				expect(statement.bindings[0]).to.equal(1);
 				expect(statement.bindings[1]).to.equal("test");
 			});
+			it("should generate a query with multiple columns and boolean values", () => {
+				const statement = GenerateQuery(QueryType.INSERT, "test", model, {
+					data: { id: 1, name: "test", flag: true },
+				});
+				expect(statement.query).to.equal(
+					"INSERT INTO `test` (id, name, flag) VALUES (?, ?, ?)"
+				);
+				expect(statement.bindings.length).to.equal(3);
+				expect(statement.bindings[0]).to.equal(1);
+				expect(statement.bindings[1]).to.equal("test");
+				expect(statement.bindings[2]).to.equal(1);
+			});
 		});
 		describe(QueryType.INSERT_OR_REPLACE, () => {
 			it("should throw an error if no data is provided", () => {
 				expect(() =>
-					GenerateQuery(QueryType.INSERT_OR_REPLACE, "test")
+					GenerateQuery(QueryType.INSERT_OR_REPLACE, "test", model)
 				).to.throw("Must provide data to insert");
 			});
 			it("should throw an error if empty data is provided", () => {
 				expect(() =>
-					GenerateQuery(QueryType.INSERT_OR_REPLACE, "test", { data: {} })
+					GenerateQuery(QueryType.INSERT_OR_REPLACE, "test", model, { data: {} })
 				).to.throw("Must provide data to insert");
 			});
 			it("should generate a basic query", () => {
-				const statement = GenerateQuery(QueryType.INSERT_OR_REPLACE, "test", {
+				const statement = GenerateQuery(QueryType.INSERT_OR_REPLACE, "test", model, {
 					data: { id: 1 },
 				});
 				expect(statement.query).to.equal(
@@ -199,7 +230,7 @@ describe("Query Builder", () => {
 				expect(statement.bindings[0]).to.equal(1);
 			});
 			it("should generate a query with multiple columns", () => {
-				const statement = GenerateQuery(QueryType.INSERT_OR_REPLACE, "test", {
+				const statement = GenerateQuery(QueryType.INSERT_OR_REPLACE, "test", model, {
 					data: { id: 1, name: "test" },
 				});
 				expect(statement.query).to.equal(
@@ -212,17 +243,17 @@ describe("Query Builder", () => {
 		});
 		describe(QueryType.UPDATE, () => {
 			it("should throw an error if no data is provided", () => {
-				expect(() => GenerateQuery(QueryType.UPDATE, "test")).to.throw(
+				expect(() => GenerateQuery(QueryType.UPDATE, "test", model)).to.throw(
 					"Must provide data to update"
 				);
 			});
 			it("should throw an error if empty data is provided", () => {
 				expect(() =>
-					GenerateQuery(QueryType.UPDATE, "test", { data: {} })
+					GenerateQuery(QueryType.UPDATE, "test", model, { data: {} })
 				).to.throw("Must provide data to update");
 			});
 			it("should generate a basic query", () => {
-				const statement = GenerateQuery(QueryType.UPDATE, "test", {
+				const statement = GenerateQuery(QueryType.UPDATE, "test", model, {
 					data: { id: 1 },
 				});
 				expect(statement.query).to.equal("UPDATE `test` SET id = ?");
@@ -230,7 +261,7 @@ describe("Query Builder", () => {
 				expect(statement.bindings[0]).to.equal(1);
 			});
 			it("should generate a query with multiple columns", () => {
-				const statement = GenerateQuery(QueryType.UPDATE, "test", {
+				const statement = GenerateQuery(QueryType.UPDATE, "test", model, {
 					data: { id: 1, name: "test" },
 				});
 				expect(statement.query).to.equal("UPDATE `test` SET id = ?, name = ?");
@@ -239,7 +270,7 @@ describe("Query Builder", () => {
 				expect(statement.bindings[1]).to.equal("test");
 			});
 			it("should generate a query with a where clause", () => {
-				const statement = GenerateQuery(QueryType.UPDATE, "test", {
+				const statement = GenerateQuery(QueryType.UPDATE, "test", model, {
 					data: { name: "test" },
 					where: { id: 1 },
 				});
@@ -251,7 +282,7 @@ describe("Query Builder", () => {
 				expect(statement.bindings[1]).to.equal(1);
 			});
 			it("should generate a query with a where clause with multiple conditions", () => {
-				const statement = GenerateQuery(QueryType.UPDATE, "test", {
+				const statement = GenerateQuery(QueryType.UPDATE, "test", model, {
 					data: { name: "test" },
 					where: { id: 1, name: "test" },
 				});
@@ -266,18 +297,18 @@ describe("Query Builder", () => {
 		});
 		describe(QueryType.UPSERT, () => {
 			it("should throw an error if invalid options are provided", () => {
-				expect(() => GenerateQuery(QueryType.UPSERT, "test")).to.throw(
+				expect(() => GenerateQuery(QueryType.UPSERT, "test", model)).to.throw(
 					"Must provide data to insert with, data to update with, and where keys in Upsert"
 				);
 				expect(() =>
-					GenerateQuery(QueryType.UPSERT, "test", {
+					GenerateQuery(QueryType.UPSERT, "test", model, {
 						data: { id: 1 },
 					})
 				).to.throw(
 					"Must provide data to insert with, data to update with, and where keys in Upsert"
 				);
 				expect(() =>
-					GenerateQuery(QueryType.UPSERT, "test", {
+					GenerateQuery(QueryType.UPSERT, "test", model, {
 						data: { id: 1 },
 						where: { id: 1 },
 					})
@@ -285,7 +316,7 @@ describe("Query Builder", () => {
 					"Must provide data to insert with, data to update with, and where keys in Upsert"
 				);
 				expect(() =>
-					GenerateQuery(QueryType.UPSERT, "test", {
+					GenerateQuery(QueryType.UPSERT, "test", model, {
 						data: { id: 1 },
 						where: { id: 1 },
 						upsertOnlyUpdateData: { id: 1 },
@@ -293,7 +324,7 @@ describe("Query Builder", () => {
 				).to.not.throw();
 			});
 			it("should generate a basic query", () => {
-				const statement = GenerateQuery(QueryType.UPSERT, "test", {
+				const statement = GenerateQuery(QueryType.UPSERT, "test", model, {
 					data: { id: 1 },
 					upsertOnlyUpdateData: { id: 2 },
 					where: { id: 3 },
@@ -307,7 +338,7 @@ describe("Query Builder", () => {
 				expect(statement.bindings[2]).to.equal(3);
 			});
 			it("should generate a query with multiple columns", () => {
-				const statement = GenerateQuery(QueryType.UPSERT, "test", {
+				const statement = GenerateQuery(QueryType.UPSERT, "test", model, {
 					data: { id: 1, name: "test" },
 					upsertOnlyUpdateData: { id: 1, name: "test" },
 					where: { id: 1 },
@@ -325,7 +356,8 @@ describe("Query Builder", () => {
 			it("should generate a query with a different ON CONFLICT key", () => {
 				const statement = GenerateQuery(
 					QueryType.UPSERT,
-					"test",
+					"test", model,
+
 					{
 						data: { id: 1, name: "test" },
 						upsertOnlyUpdateData: { id: 1, name: "test" },
@@ -346,7 +378,7 @@ describe("Query Builder", () => {
 			it("should accept multiple primary keys", () => {
 				const statement = GenerateQuery(
 					QueryType.UPSERT,
-					"test",
+					"test", model,
 					{
 						data: { id: 1, name: "test" },
 						upsertOnlyUpdateData: { id: 1, name: "test" },
