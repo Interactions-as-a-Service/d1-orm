@@ -1,5 +1,3 @@
-import type { ModelColumn } from "./model";
-
 /**
  * @enum {string} - The type of the query
  */
@@ -62,7 +60,6 @@ export type OrderBy<T extends object> =
 export function GenerateQuery<T extends object>(
 	type: QueryType,
 	tableName: string,
-	columns: Record<string, ModelColumn>,
 	options: GenerateQueryOptions<T> = {},
 	primaryKeys: string | string[] = "id"
 ): { bindings: unknown[]; query: string } {
@@ -78,7 +75,7 @@ export function GenerateQuery<T extends object>(
 				const whereStmt = [];
 				for (const [key, value] of Object.entries(options.where)) {
 					whereStmt.push(`${key} = ?`);
-					bindings.push(typedValue(value));
+					bindings.push(coerceTypedValue(value));
 				}
 				if (whereStmt.length) query += ` WHERE ${whereStmt.join(" AND ")}`;
 			}
@@ -99,7 +96,7 @@ export function GenerateQuery<T extends object>(
 				const whereStmt = [];
 				for (const [key, value] of Object.entries(options.where)) {
 					whereStmt.push(`${key} = ?`);
-					bindings.push(typedValue(value));
+					bindings.push(coerceTypedValue(value));
 				}
 				if (whereStmt.length) query += ` WHERE ${whereStmt.join(" AND ")}`;
 			}
@@ -107,7 +104,6 @@ export function GenerateQuery<T extends object>(
 		}
 		case QueryType.INSERT_OR_REPLACE:
 		case QueryType.INSERT: {
-			console.log("NOW")
 			query = `${type} INTO \`${tableName}\``;
 			if (
 				typeof options.data !== "object" ||
@@ -118,7 +114,7 @@ export function GenerateQuery<T extends object>(
 			const keys = [];
 			for (const [key, value] of Object.entries(options.data)) {
 				keys.push(key);
-				bindings.push(typedValue(value));
+				bindings.push(coerceTypedValue(value));
 			}
 			query += ` (${keys.join(", ")}) VALUES (${"?"
 				.repeat(keys.length)
@@ -137,14 +133,14 @@ export function GenerateQuery<T extends object>(
 			const keys = [];
 			for (const [key, value] of Object.entries(options.data)) {
 				keys.push(`${key} = ?`);
-				bindings.push(typedValue(value));
+				bindings.push(coerceTypedValue(value));
 			}
 			query += ` SET ${keys.join(", ")}`;
 			if (options.where) {
 				const whereStmt = [];
 				for (const [key, value] of Object.entries(options.where)) {
 					whereStmt.push(`${key} = ?`);
-					bindings.push(typedValue(value));
+					bindings.push(coerceTypedValue(value));
 				}
 				if (whereStmt.length) query += ` WHERE ${whereStmt.join(" AND ")}`;
 			}
@@ -159,7 +155,7 @@ export function GenerateQuery<T extends object>(
 				...Object.values(options.upsertOnlyUpdateData ?? {}),
 				...Object.values(options.where ?? {})
 			);
-
+			coerceTypedValues(bindings);
 			if (
 				insertDataKeys.length === 0 ||
 				updateDataKeys.length === 0 ||
@@ -192,11 +188,16 @@ export function GenerateQuery<T extends object>(
 	};
 }
 
-export function typedValue(value: unknown) {
+export function coerceTypedValues(list: Array<unknown>) {
+	for (let i = 0; i < list.length; i++) {
+		list[i] = coerceTypedValue(list[i]);
+	}
+}
+
+export function coerceTypedValue(value: unknown) {
 	if (typeof value === "boolean") {
 		return value ? 1 : 0;
-	}
-	else {
+	} else {
 		return value;
 	}
 }

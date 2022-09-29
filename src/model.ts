@@ -145,7 +145,7 @@ export class Model<T extends object> {
 		orReplace = false
 	): Promise<D1Result<T>> {
 		const qt = orReplace ? QueryType.INSERT_OR_REPLACE : QueryType.INSERT;
-		const statement = GenerateQuery(qt, this.tableName, this.columns, { data });
+		const statement = GenerateQuery(qt, this.tableName, { data });
 		return this.#D1Orm
 			.prepare(statement.query)
 			.bind(...statement.bindings)
@@ -162,7 +162,7 @@ export class Model<T extends object> {
 		const qt = orReplace ? QueryType.INSERT_OR_REPLACE : QueryType.INSERT;
 		const stmts: D1PreparedStatement[] = [];
 		for (const row of data) {
-			const stmt = GenerateQuery(qt, this.tableName, this.columns, {
+			const stmt = GenerateQuery(qt, this.tableName, {
 				data: row,
 			});
 			stmts.push(this.#D1Orm.prepare(stmt.query).bind(...stmt.bindings));
@@ -179,7 +179,7 @@ export class Model<T extends object> {
 	): Promise<T | null> {
 		const statement = GenerateQuery(
 			QueryType.SELECT,
-			this.tableName, this.columns,
+			this.tableName,
 			Object.assign(options, { limit: 1 })
 		);
 		try {
@@ -202,7 +202,7 @@ export class Model<T extends object> {
 	public async All(
 		options: Omit<GenerateQueryOptions<T>, "data" | "upsertOnlyUpdateData">
 	): Promise<D1Result<T[]>> {
-		const statement = GenerateQuery(QueryType.SELECT, this.tableName, this.columns, options);
+		const statement = GenerateQuery(QueryType.SELECT, this.tableName, options);
 		return this.#D1Orm
 			.prepare(statement.query)
 			.bind(...statement.bindings)
@@ -215,7 +215,7 @@ export class Model<T extends object> {
 	public async Delete(
 		options: Pick<GenerateQueryOptions<T>, "where">
 	): Promise<D1Result<unknown>> {
-		const statement = GenerateQuery(QueryType.DELETE, this.tableName, this.columns, options);
+		const statement = GenerateQuery(QueryType.DELETE, this.tableName, options);
 		return this.#D1Orm
 			.prepare(statement.query)
 			.bind(...statement.bindings)
@@ -229,7 +229,7 @@ export class Model<T extends object> {
 	public async Update(
 		options: Pick<GenerateQueryOptions<T>, "where" | "data">
 	): Promise<D1Result<unknown>> {
-		const statement = GenerateQuery(QueryType.UPDATE, this.tableName, this.columns, options);
+		const statement = GenerateQuery(QueryType.UPDATE, this.tableName, options);
 		return this.#D1Orm
 			.prepare(statement.query)
 			.bind(...statement.bindings)
@@ -249,7 +249,7 @@ export class Model<T extends object> {
 	) {
 		const statement = GenerateQuery(
 			QueryType.UPSERT,
-			this.tableName, this.columns,
+			this.tableName,
 			options,
 			this.#primaryKeys
 		);
