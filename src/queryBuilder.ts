@@ -188,12 +188,14 @@ export function GenerateQuery<T extends object>(
 	};
 }
 
+/** @hidden */
 export function coerceTypedValues(list: Array<unknown>) {
 	for (let i = 0; i < list.length; i++) {
 		list[i] = coerceTypedValue(list[i]);
 	}
 }
 
+/** @hidden */
 export function coerceTypedValue(value: unknown) {
 	if (typeof value === "boolean") {
 		return value ? 1 : 0;

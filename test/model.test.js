@@ -155,4 +155,52 @@ describe("Model > Create Tables", () => {
 			'CREATE TABLE `test` (id integer, name text DEFAULT "test", PRIMARY KEY (id));'
 		);
 	});
+	it("should support a default value for boolean string true", () => {
+		const model = new Model(
+			{ D1Orm: orm, tableName: "test" },
+			{
+				id: { type: DataTypes.INTEGER, primaryKey: true },
+				flag: { type: DataTypes.BOOLEAN, defaultValue: "true" },
+			}
+		);
+		expect(model.createTableDefinition).to.equal(
+			'CREATE TABLE `test` (id integer, flag integer DEFAULT "1", PRIMARY KEY (id));'
+		);
+	});
+	it("should support a default value for boolean false", () => {
+		const model = new Model(
+			{ D1Orm: orm, tableName: "test" },
+			{
+				id: { type: DataTypes.INTEGER, primaryKey: true },
+				flag: { type: DataTypes.BOOLEAN, defaultValue: false },
+			}
+		);
+		expect(model.createTableDefinition).to.equal(
+			'CREATE TABLE `test` (id integer, flag integer DEFAULT "0", PRIMARY KEY (id));'
+		);
+	});
+	it("should support a default value for integer 0 false", () => {
+		const model = new Model(
+			{ D1Orm: orm, tableName: "test" },
+			{
+				id: { type: DataTypes.INTEGER, primaryKey: true },
+				flag: { type: DataTypes.BOOLEAN, defaultValue: 0 },
+			}
+		);
+		expect(model.createTableDefinition).to.equal(
+			'CREATE TABLE `test` (id integer, flag integer DEFAULT "0", PRIMARY KEY (id));'
+		);
+	});
+	it("should support a default value for integer 1 true", () => {
+		const model = new Model(
+			{ D1Orm: orm, tableName: "test" },
+			{
+				id: { type: DataTypes.INTEGER, primaryKey: true },
+				flag: { type: DataTypes.BOOLEAN, defaultValue: 1 },
+			}
+		);
+		expect(model.createTableDefinition).to.equal(
+			'CREATE TABLE `test` (id integer, flag integer DEFAULT "1", PRIMARY KEY (id));'
+		);
+	});
 });

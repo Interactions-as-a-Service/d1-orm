@@ -79,7 +79,9 @@ export class Model<T extends object> {
 		const columnEntries = Object.entries(this.columns);
 		let hasAutoIncrement = false;
 		const columnDefinition = columnEntries.map(([columnName, column]) => {
-			let definition = `${columnName} ${column.type}`;
+			console.log(column.type);
+			const ct = column.type === DataTypes.BOOLEAN ? "integer" : column.type;
+			let definition = `${columnName} ${ct}`;
 			if (column.autoIncrement) {
 				hasAutoIncrement = true;
 				definition += " PRIMARY KEY AUTOINCREMENT";
@@ -91,7 +93,7 @@ export class Model<T extends object> {
 				definition += " UNIQUE";
 			}
 			if (column.defaultValue !== undefined) {
-				definition += ` DEFAULT "${column.defaultValue}"`;
+				definition += ` DEFAULT "${this.coerceTypedValue(column)}"`;
 			}
 			return definition;
 		});
@@ -100,6 +102,14 @@ export class Model<T extends object> {
 		return `CREATE TABLE \`${this.tableName}\` (${columnDefinition.join(
 			", "
 		)});`;
+	}
+
+	private coerceTypedValue(column: ModelColumn): unknown {
+		if (column.type === DataTypes.BOOLEAN) {
+			return Boolean(column.defaultValue).valueOf() ? 1 : 0;
+		} else {
+			return column.defaultValue;
+		}
 	}
 
 	/**

@@ -7,7 +7,7 @@
 export enum DataTypes {
 	INTEGER = "integer",
 	INT = "integer",
-	BOOLEAN = "integer",
+	BOOLEAN = "boolean",
 	TEXT = "text",
 	STRING = "text",
 	VARCHAR = "text",

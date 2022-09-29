@@ -42,6 +42,10 @@ const users = new Model<User>(
 			type: DataTypes.STRING,
 			unique: true,
 		},
+		validated: {
+			type: DataTypes.BOOLEAN,
+			defaultValue: false,
+		},
 	}
 );
 ```
@@ -76,6 +80,8 @@ That's it! You've now created a model. You can now use the model to query the da
 
 There are two ways of selecting data from the database. The first is to use the {@link Model.First} method which will return one result, and the second is to use the {@link Model.All} method, which will return an array of results.
 
+All columns specified in the model as `DataTypes.BOOLEAN` will be stored in the database as `false = 0, true = 1`. Data returned will be returned typed as an integer. What this means is that if executing an equality test, an if statement will operate exactly as intended if you use a `==`. This is because a zero is a falsey value and one is a truthy value and the actual data type is not being compared. Attempting to test boolean equality with `===` will not yield the desired result as this equality check first checks the data type of the value and boolean != integer.
+
 #### First()
 
 Let's start with the {@link Model.First} method. This method will return the first result that matches the query. It takes a single argument, which is an object containing a `Where` clause. See [Query Building](/guides/query-building) for more information on how to use the `Where` clause. This should be an object with a key of the column name, and a value of the value to match.
@@ -104,6 +110,8 @@ This will return the first 10 users with a name of "John Doe", ordered by ID, eq
 ### Inserting Data
 
 There are two methods used to insert data into the database. The first is {@link Model.InsertOne}, which will insert a single row, and the second is {@link Model.InsertMany}, which will insert multiple rows. Both accept an optional boolean parameter instructing the [Query Building](/guides/query-building) to generate `INSERT or REPLACE` instead of just `INSERT`. This mechanism differs from [Upsert](/guides/upserting) by its requirement of only replacing records based on the primary key.
+
+All columns specified in the model as `DataTypes.BOOLEAN` will be stored in the database as integer values where `false = 0, true = 1`.
 
 #### InsertOne()
 
