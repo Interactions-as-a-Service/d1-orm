@@ -308,5 +308,30 @@ type InferFromColumns<T extends Record<string, { type: DataTypes }>> = {
 	[K in keyof T]: InferJSTypeFromModelColumn<T[K]>;
 };
 
+/**
+ * Infer is a utility type that allows you to infer the type of a model from the columns.
+ * @example
+ * ```ts
+ * import { Model, DataTypes } from "d1-orm";
+ * import type { Infer } from "d1-orm";
+ *
+ * const users = new Model(
+ * 	{
+ * 		tableName: "users",
+ * 		D1Orm: MyD1OrmInstance,
+ * 	},
+ * 	{
+ * 		name: DataTypes.STRING,
+ * 		age: DataTypes.NUMBER,
+ * 	}
+ * );
+ *
+ * type User = Infer<typeof users>;
+ * //type User = {
+ * 	//name: string,
+ * 	//age: number
+ * //}
+ * ```
+ */
 export type Infer<T extends { columns: Record<string, ModelColumn> }> =
 	InferFromColumns<T["columns"]>;
