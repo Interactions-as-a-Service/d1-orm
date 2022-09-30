@@ -161,4 +161,4 @@ This is equivalent to `UPDATE users SET name = "Jane Doe" WHERE name = "John Doe
 
 ### Upserting Data
 
-See [Upserting Data](/guides/upserting).
+See [Upserting Data](/guides/upserting#upserting-with-models).
