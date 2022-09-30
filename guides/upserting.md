@@ -78,8 +78,50 @@ The next parameter is the `QueryOptions` object. This is where we specify the da
 - `where`: This is the unique key we want to use to determine if the record exists. In this case, we use the `id` field. `id` is the only field that's useful here, but you can use multiple fields if you want.
 - `upsertOnlyUpdateData`: This is the data we want to update if the record exists. In this case, we use the `name` and `email` fields.
 
-Finally, the QueryBuilder allows you to provide a primary key for UPSERT operations, if you so choose. It will default to `id`. This is the key that is used in the `ON CONFLICT` statement. In this case, we use `id` as well.
+Finally, the QueryBuilder allows you to provide a primary key for UPSERT operations, if you so choose. It will default to `id`. This is the key that is used in the `ON CONFLICT` statement. In this case, we use `id` as well. You can specify an array of keys if you're using composite primary keys.
 
 \*Note: This primary key value will be ignored for all other operations, and will only be used for UPSERT operations.
 
-Upserting can also be done with [Models](/guides/models), and is very easy to do. If you wish to do so, refer to the section of that guide.
+### Upserting with Models
+This follows the same process as the previous example, but with a [Model](/guides/models) instead of the raw query builder interface.
+
+```ts
+import { Model, DataTypes } from "d1-orm";
+import type { Infer } from "d1-orm";
+
+const users = new Model({
+	tableName: "users",
+	D1Orm: MyD1OrmInstance,
+}, {
+	id: {
+		type: DataTypes.INTEGER,
+		primaryKey: true,
+	},
+	name: {
+		type: DataTypes.STRING,
+		notNull: true,
+	},
+	email: {
+		type: DataTypes.STRING,
+	},
+});
+
+type User = Infer<typeof users>;
+
+const user: User = {
+	id: 1,
+	name: "John Doe",
+	email: "john-doe@gmail.com",
+};
+
+await users.Upsert({
+	data: user,
+	upsertOnlyUpdateData: {
+		name: user.name,
+		email: user.email,
+	},
+	where: {
+		id: user.id,
+	},
+});
+```
