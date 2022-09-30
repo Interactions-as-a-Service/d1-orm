@@ -20,22 +20,17 @@ This package is recommended to be used with [@cloudflare/workers-types](https://
 
 ```ts
 import { D1Orm, DataTypes, Model } from "d1-orm";
+import type { Infer } from "d1-orm";
 
 export interface Env {
 	// from @cloudflare/workers-types
 	DB: D1Database;
 }
 
-type User = {
-	id: number;
-	name: string;
-	email: string | undefined;
-};
-
 export default {
 	async fetch(request: Request, env: Env) {
 		const orm = new D1Orm(env.DB);
-		const users = new Model<User>(
+		const users = new Model(
 			{
 				D1Orm: orm,
 				tableName: "users",
@@ -58,6 +53,14 @@ export default {
 				},
 			}
 		);
+		type User = Infer<typeof users>;
+
+		await users.First({
+			where: {
+				id: 1,
+			},
+		});
+		// Promise<User | null>
 	},
 };
 ```
