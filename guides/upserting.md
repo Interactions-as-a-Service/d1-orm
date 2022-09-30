@@ -83,28 +83,32 @@ Finally, the QueryBuilder allows you to provide a primary key for UPSERT operati
 \*Note: This primary key value will be ignored for all other operations, and will only be used for UPSERT operations.
 
 ### Upserting with Models
+
 This follows the same process as the previous example, but with a [Model](/guides/models) instead of the raw query builder interface.
 
 ```ts
 import { Model, DataTypes } from "d1-orm";
 import type { Infer } from "d1-orm";
 
-const users = new Model({
-	tableName: "users",
-	D1Orm: MyD1OrmInstance,
-}, {
-	id: {
-		type: DataTypes.INTEGER,
-		primaryKey: true,
+const users = new Model(
+	{
+		tableName: "users",
+		D1Orm: MyD1OrmInstance,
 	},
-	name: {
-		type: DataTypes.STRING,
-		notNull: true,
-	},
-	email: {
-		type: DataTypes.STRING,
-	},
-});
+	{
+		id: {
+			type: DataTypes.INTEGER,
+			primaryKey: true,
+		},
+		name: {
+			type: DataTypes.STRING,
+			notNull: true,
+		},
+		email: {
+			type: DataTypes.STRING,
+		},
+	}
+);
 
 type User = Infer<typeof users>;
 
