@@ -1,5 +1,35 @@
 # d1-orm
 
+## 0.5.0
+
+### Minor Changes
+
+- [#44](https://github.com/Interactions-as-a-Service/d1-orm/pull/44) [`101043b`](https://github.com/Interactions-as-a-Service/d1-orm/commit/101043b9ff823598774f9113870d11931f7d1506) Thanks [@Skye-31](https://github.com/Skye-31)! - Feat: Inferred Types!
+
+  Models no longer require you to specify a definition when you create them. Instead, you can just pass in an object and the model will infer the types for you. See the following example:
+
+  ```ts
+  import { Model, DataTypes } from "d1-orm";
+  import type { Infer } from "d1-orm";
+
+  const users = new Model(
+  	{
+  		tableName: "users",
+  		D1Orm: MyD1OrmInstance,
+  	},
+  	{
+  		name: DataTypes.STRING,
+  		age: DataTypes.NUMBER,
+  	}
+  );
+
+  type User = Infer<typeof users>;
+  // type User = {
+  // 	name: string,
+  // 	age: number
+  // }
+  ```
+
 ## 0.4.0
 
 ### Minor Changes
