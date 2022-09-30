@@ -1,25 +1,23 @@
 import { D1Orm } from "./database.js";
-import { DataTypes } from "./datatypes.js";
 import { QueryType, GenerateQuery } from "./queryBuilder.js";
 import type { GenerateQueryOptions } from "./queryBuilder.js";
 
 /**
  * @typeParam T - The type of the model, which will be returned when using methods such as First() or All()
  */
-export class Model<T extends object> {
+export class Model<T extends Record<string, ModelColumn>> {
 	/**
 	 * @param options - The options for the model. The table name & D1Orm instance are required.
 	 * @param options.tableName - The name of the table to use.
 	 * @param options.D1Orm - The D1Orm instance to use.
 	 * @param columns - The columns for the model. The keys are the column names, and the values are the column options. See {@link ModelColumn}
-	 * @typeParam T - The type of the model, which will be returned when using methods such as First() or All()
 	 */
 	constructor(
 		options: {
 			D1Orm: D1Orm;
 			tableName: string;
 		},
-		columns: Record<Extract<keyof T, string>, ModelColumn>
+		columns: T
 	) {
 		this.#D1Orm = options.D1Orm;
 		this.tableName = options.tableName;
@@ -65,7 +63,7 @@ export class Model<T extends object> {
 		}
 	}
 	public tableName: string;
-	public readonly columns: Record<string, ModelColumn>;
+	public readonly columns: T;
 	readonly #D1Orm: D1Orm;
 
 	get #primaryKeys(): string[] {
@@ -141,7 +139,7 @@ export class Model<T extends object> {
 	 * @param data The data to insert into the table, as an object with the column names as keys and the values as values.
 	 */
 	public async InsertOne(
-		data: Partial<T>,
+		data: Partial<InferFromColumns<T>>,
 		orReplace = false
 	): Promise<D1Result<T>> {
 		const qt = orReplace ? QueryType.INSERT_OR_REPLACE : QueryType.INSERT;
@@ -156,7 +154,7 @@ export class Model<T extends object> {
 	 * @param data The data to insert into the table, as an array of objects with the column names as keys and the values as values.
 	 */
 	public async InsertMany(
-		data: Partial<T>[],
+		data: Partial<InferFromColumns<T>>[],
 		orReplace = false
 	): Promise<D1Result<T>[]> {
 		const qt = orReplace ? QueryType.INSERT_OR_REPLACE : QueryType.INSERT;
@@ -175,7 +173,7 @@ export class Model<T extends object> {
 	 * @returns Returns the first row that matches the where clause, or null if no rows match.
 	 */
 	public async First(
-		options: Pick<GenerateQueryOptions<T>, "where">
+		options: Pick<GenerateQueryOptions<Partial<InferFromColumns<T>>>, "where">
 	): Promise<T | null> {
 		const statement = GenerateQuery(
 			QueryType.SELECT,
@@ -200,7 +198,10 @@ export class Model<T extends object> {
 	 * @returns Returns all rows that match the where clause.
 	 */
 	public async All(
-		options: Omit<GenerateQueryOptions<T>, "data" | "upsertOnlyUpdateData">
+		options: Omit<
+			GenerateQueryOptions<Partial<InferFromColumns<T>>>,
+			"data" | "upsertOnlyUpdateData"
+		>
 	): Promise<D1Result<T[]>> {
 		const statement = GenerateQuery(QueryType.SELECT, this.tableName, options);
 		return this.#D1Orm
@@ -213,7 +214,7 @@ export class Model<T extends object> {
 	 * @param options The options for the query, see {@link GenerateQueryOptions}
 	 */
 	public async Delete(
-		options: Pick<GenerateQueryOptions<T>, "where">
+		options: Pick<GenerateQueryOptions<Partial<InferFromColumns<T>>>, "where">
 	): Promise<D1Result<unknown>> {
 		const statement = GenerateQuery(QueryType.DELETE, this.tableName, options);
 		return this.#D1Orm
@@ -227,7 +228,10 @@ export class Model<T extends object> {
 	 * @throws Throws an error if the data clause is empty.
 	 */
 	public async Update(
-		options: Pick<GenerateQueryOptions<T>, "where" | "data">
+		options: Pick<
+			GenerateQueryOptions<Partial<InferFromColumns<T>>>,
+			"where" | "data"
+		>
 	): Promise<D1Result<unknown>> {
 		const statement = GenerateQuery(QueryType.UPDATE, this.tableName, options);
 		return this.#D1Orm
@@ -243,7 +247,7 @@ export class Model<T extends object> {
 	 */
 	public async Upsert(
 		options: Pick<
-			GenerateQueryOptions<T>,
+			GenerateQueryOptions<Partial<InferFromColumns<T>>>,
 			"where" | "data" | "upsertOnlyUpdateData"
 		>
 	) {
@@ -272,3 +276,37 @@ export type ModelColumn = {
 	autoIncrement?: boolean;
 	defaultValue?: unknown;
 };
+
+/**
+ * @enum {string} Aliases for DataTypes used in a {@link ModelColumn} definition.
+ */
+export enum DataTypes {
+	INTEGER = "integer",
+	INT = "integer",
+	TEXT = "text",
+	STRING = "text",
+	VARCHAR = "text",
+	CHAR = "text",
+	NUMBER = "real",
+	NUMERIC = "real",
+	REAL = "real",
+	BLOB = "blob",
+}
+
+type InferJSTypeFromModelColumn<T extends { type: DataTypes }> =
+	T["type"] extends DataTypes.INTEGER
+		? number
+		: T["type"] extends DataTypes.REAL
+		? number
+		: T["type"] extends DataTypes.TEXT
+		? string
+		: T["type"] extends DataTypes.BLOB
+		? Uint32Array
+		: never;
+
+type InferFromColumns<T extends Record<string, { type: DataTypes }>> = {
+	[K in keyof T]: InferJSTypeFromModelColumn<T[K]>;
+};
+
+export type Infer<T extends { columns: Record<string, ModelColumn> }> =
+	InferFromColumns<T["columns"]>;
