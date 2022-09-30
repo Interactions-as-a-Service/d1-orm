@@ -2,17 +2,7 @@ Models are a wrapper around the [Query Builder](/guides/query-building) that all
 
 ### Creating a Model
 
-To start with, we'll make a type for our model. This is optional, but it's recommended to make a type for your model so you can have improved type safety.
-
-```ts
-type User = {
-	id: number;
-	name: string;
-	email: string | undefined;
-};
-```
-
-Now we need to define the Model structure.
+To start with, we'll define the Model structure.
 
 ```ts
 import { D1Orm, DataTypes, Model } from "d1-orm";
@@ -21,7 +11,7 @@ import { D1Orm, DataTypes, Model } from "d1-orm";
 const orm = new D1Orm(env.DB);
 
 // Now, to create the model:
-const users = new Model<User>(
+const users = new Model(
 	{
 		D1Orm: orm,
 		tableName: "users",
@@ -46,11 +36,23 @@ const users = new Model<User>(
 );
 ```
 
+Hint: If you're using typescript, you can automatically determine the type of your table using the following:
+
+```ts
+import type { Infer } from "d1-orm";
+
+type User = Infer<typeof users>;
+```
+
+**Now, let's break down what's happening here.**
+
 Both arguments are required. The first argument is the model options, and the second argument is the model schema.
 
 - The model options should contain the `D1Orm` instance we created earlier, and the `tableName` of the model.
 
 - The model schema should contain the columns of the model. The key of the object should be the name of the column, and the value should be the column options. See {@link ModelColumn} for API reference.
+
+### What next?
 
 The next step is to create the table in the database. This is done by calling the {@link Model.CreateTable} method on the model. There are two strategies for this:
 

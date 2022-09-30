@@ -1,7 +1,6 @@
 import { expect } from "chai";
 import { D1Orm } from "../lib/database.js";
-import { DataTypes } from "../lib/datatypes.js";
-import { Model } from "../lib/model.js";
+import { Model, DataTypes } from "../lib/model.js";
 
 const fakeD1Database = {
 	prepare: () => {},
