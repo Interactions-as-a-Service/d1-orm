@@ -1,5 +1,11 @@
 # d1-orm
 
+## 0.5.1
+
+### Patch Changes
+
+- [`926d8c6`](https://github.com/Interactions-as-a-Service/d1-orm/commit/926d8c6c5ad304faf215dc0b38bbd7b7ad876d1a) Thanks [@Skye-31](https://github.com/Skye-31)! - Chore: fix Model return types for First() and All()
+
 ## 0.5.0
 
 ### Minor Changes
