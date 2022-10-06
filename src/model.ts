@@ -141,7 +141,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 	public async InsertOne(
 		data: Partial<InferFromColumns<T>>,
 		orReplace = false
-	): Promise<D1Result<T>> {
+	): Promise<D1Result<InferFromColumns<T>>> {
 		const qt = orReplace ? QueryType.INSERT_OR_REPLACE : QueryType.INSERT;
 		const statement = GenerateQuery(qt, this.tableName, { data });
 		return this.#D1Orm
@@ -156,7 +156,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 	public async InsertMany(
 		data: Partial<InferFromColumns<T>>[],
 		orReplace = false
-	): Promise<D1Result<T>[]> {
+	): Promise<D1Result<InferFromColumns<T>>[]> {
 		const qt = orReplace ? QueryType.INSERT_OR_REPLACE : QueryType.INSERT;
 		const stmts: D1PreparedStatement[] = [];
 		for (const row of data) {
@@ -165,7 +165,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 			});
 			stmts.push(this.#D1Orm.prepare(stmt.query).bind(...stmt.bindings));
 		}
-		return this.#D1Orm.batch<T>(stmts);
+		return this.#D1Orm.batch(stmts);
 	}
 
 	/**
@@ -174,7 +174,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 	 */
 	public async First(
 		options: Pick<GenerateQueryOptions<Partial<InferFromColumns<T>>>, "where">
-	): Promise<T | null> {
+	): Promise<InferFromColumns<T> | null> {
 		const statement = GenerateQuery(
 			QueryType.SELECT,
 			this.tableName,
@@ -202,7 +202,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 			GenerateQueryOptions<Partial<InferFromColumns<T>>>,
 			"data" | "upsertOnlyUpdateData"
 		>
-	): Promise<D1Result<T[]>> {
+	): Promise<D1Result<InferFromColumns<T>[]>> {
 		const statement = GenerateQuery(QueryType.SELECT, this.tableName, options);
 		return this.#D1Orm
 			.prepare(statement.query)
