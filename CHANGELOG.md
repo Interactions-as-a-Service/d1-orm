@@ -1,5 +1,11 @@
 # d1-orm
 
+## 0.5.3
+
+### Patch Changes
+
+- [`5d09207`](https://github.com/Interactions-as-a-Service/d1-orm/commit/5d09207b339ffc276282d6b84107f84bcd920520) Thanks [@Skye-31](https://github.com/Skye-31)! - Chore: export some types used by Model so VSC can pick up on them
+
 ## 0.5.2
 
 ### Patch Changes
