@@ -291,9 +291,10 @@ export enum DataTypes {
 	NUMERIC = "real",
 	REAL = "real",
 	BLOB = "blob",
+	BOOLEAN = "boolean",
 }
 
-type InferJSTypeFromModelColumn<T extends { type: DataTypes }> =
+type InferFromColumn<T extends ModelColumn> =
 	T["type"] extends DataTypes.INTEGER
 		? number
 		: T["type"] extends DataTypes.REAL
@@ -301,11 +302,13 @@ type InferJSTypeFromModelColumn<T extends { type: DataTypes }> =
 		: T["type"] extends DataTypes.TEXT
 		? string
 		: T["type"] extends DataTypes.BLOB
-		? Uint32Array
+		? ArrayBuffer
+		: T["type"] extends DataTypes.BOOLEAN
+		? 1 | 0
 		: never;
 
-type InferFromColumns<T extends Record<string, { type: DataTypes }>> = {
-	[K in keyof T]: InferJSTypeFromModelColumn<T[K]>;
+type InferFromColumns<T extends Record<string, ModelColumn>> = {
+	[K in keyof T]: InferFromColumn<T[K]>;
 };
 
 /**
@@ -321,8 +324,12 @@ type InferFromColumns<T extends Record<string, { type: DataTypes }>> = {
  * 		D1Orm: MyD1OrmInstance,
  * 	},
  * 	{
- * 		name: DataTypes.STRING,
- * 		age: DataTypes.NUMBER,
+ * 		name: {
+ * 			type: DataTypes.STRING
+ * 		},
+ * 		age: {
+ * 			type: DataTypes.NUMBER
+ * 		},
  * 	}
  * );
  *
