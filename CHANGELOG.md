@@ -1,5 +1,11 @@
 # d1-orm
 
+## 0.5.2
+
+### Patch Changes
+
+- [`b214e74`](https://github.com/Interactions-as-a-Service/d1-orm/commit/b214e74a5c7c56fb593008b87bf819affb52fb47) Thanks [@Skye-31](https://github.com/Skye-31)! - Feat: boolean support
+
 ## 0.5.1
 
 ### Patch Changes
