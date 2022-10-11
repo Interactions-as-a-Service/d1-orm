@@ -294,7 +294,10 @@ export enum DataTypes {
 	BOOLEAN = "boolean",
 }
 
-type InferFromColumn<T extends ModelColumn> =
+/**
+ * This is a helper type that allows you to know the JS type of a {@link ModelColumn} type.
+ */
+export type InferFromColumn<T extends ModelColumn> =
 	T["type"] extends DataTypes.INTEGER
 		? number
 		: T["type"] extends DataTypes.REAL
@@ -307,7 +310,10 @@ type InferFromColumn<T extends ModelColumn> =
 		? 1 | 0
 		: never;
 
-type InferFromColumns<T extends Record<string, ModelColumn>> = {
+/**
+ * This is a helper type that allows you to know the JS type of a Record of {@link ModelColumn}s.
+ */
+export type InferFromColumns<T extends Record<string, ModelColumn>> = {
 	[K in keyof T]: InferFromColumn<T[K]>;
 };
 
