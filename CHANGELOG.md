@@ -1,5 +1,11 @@
 # d1-orm
 
+## 0.5.4
+
+### Patch Changes
+
+- [`b8e1ce6`](https://github.com/Interactions-as-a-Service/d1-orm/commit/b8e1ce67342044d750a312a1fc6d843bde8d0afa) Thanks [@Skye-31](https://github.com/Skye-31)! - Chore: fix inferred return type for Model.First()
+
 ## 0.5.3
 
 ### Patch Changes
