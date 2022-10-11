@@ -184,7 +184,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 			return await this.#D1Orm
 				.prepare(statement.query)
 				.bind(...statement.bindings)
-				.first();
+				.first<InferFromColumns<T>>();
 		} catch (e) {
 			if ((e as Error).message === "D1_NORESULTS") {
 				return null;
