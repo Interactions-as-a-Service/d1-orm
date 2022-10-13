@@ -314,7 +314,9 @@ export type InferFromColumn<T extends ModelColumn> =
  * This is a helper type that allows you to know the JS type of a Record of {@link ModelColumn}s.
  */
 export type InferFromColumns<T extends Record<string, ModelColumn>> = {
-	[K in keyof T]: InferFromColumn<T[K]>;
+	[K in keyof T]: T[K]["notNull"] extends true
+		? InferFromColumn<T[K]>
+		: InferFromColumn<T[K]> | null;
 };
 
 /**
