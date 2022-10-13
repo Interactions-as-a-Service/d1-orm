@@ -1,5 +1,13 @@
 # d1-orm
 
+## 0.5.5
+
+### Patch Changes
+
+- [`fc7cb87`](https://github.com/Interactions-as-a-Service/d1-orm/commit/fc7cb87c677e7b673ac0530baf00cafe7be67c73) Thanks [@Skye-31](https://github.com/Skye-31)! - Feat: Allow null items in Infer<Model>
+
+  This change checks NOT NULL constraints on the model definition, and allows null when the constraint is not present.
+
 ## 0.5.4
 
 ### Patch Changes
