@@ -11,7 +11,7 @@ Docs can be found at https://d1-orm.pages.dev/guides
 This package can be [found on NPM](https://npmjs.com/package/d1-orm)
 
 ```sh
-$ npm install d1-orm
+npm install d1-orm
 ```
 
 ## Usage
