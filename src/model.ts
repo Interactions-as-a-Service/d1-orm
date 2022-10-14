@@ -296,6 +296,8 @@ export enum DataTypes {
 
 /**
  * This is a helper type that allows you to know the JS type of a {@link ModelColumn} type.
+ * Should not be used directly, instead see {@link Infer}
+ * @internal
  */
 export type InferFromColumn<T extends ModelColumn> =
 	T["type"] extends DataTypes.INTEGER
@@ -312,6 +314,8 @@ export type InferFromColumn<T extends ModelColumn> =
 
 /**
  * This is a helper type that allows you to know the JS type of a Record of {@link ModelColumn}s.
+ * Should not be used directly, instead see {@link Infer}
+ * @internal
  */
 export type InferFromColumns<T extends Record<string, ModelColumn>> = {
 	[K in keyof T]: T[K]["notNull"] extends true
