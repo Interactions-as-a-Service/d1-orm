@@ -88,7 +88,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 			}
 		}
 	}
-	public tableName: string;
+	public readonly tableName: string;
 	public readonly columns: T;
 	public readonly primaryKeys: Extract<keyof T, string>[];
 	public readonly uniqueKeys: Extract<keyof T, string>[][];
