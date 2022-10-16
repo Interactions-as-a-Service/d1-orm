@@ -132,17 +132,17 @@ export class Model<T extends Record<string, ModelColumn>> {
 	 * @param options The options for creating the table. Currently only contains strategy, which is the strategy to use when creating the table.
 	 * - "default" - The default strategy, which will attempt create the table.
 	 * - "force" - Drops the table if it exists, then creates it
-	 * - "alter" - [NOT YET IMPLEMENTED] Attempts to alter the table to match the model
 	 * @throws
 	 * - Throws an error if the table already exists and the strategy is not "force".
 	 * - Throws an error if the strategy is "alter", as this is not yet implemented
 	 */
 	public async CreateTable(
-		options: { strategy: "default" | "force" | "alter" } = {
+		options: { strategy: "default" | "force" /* | alter */ } = {
 			strategy: "default",
 		}
 	): Promise<D1Result<unknown>> {
 		const { strategy } = options;
+		// @ts-expect-error Alter is not yet implemented
 		if (strategy === "alter") {
 			throw new Error("Alter strategy is not implemented");
 		}
