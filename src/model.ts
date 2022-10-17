@@ -21,7 +21,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 			tableName: string;
 			primaryKeys: Extract<keyof T, string> | Extract<keyof T, string>[];
 			autoIncrement?: Extract<keyof T, string>;
-			uniqueKeys: Extract<keyof T, string>[][];
+			uniqueKeys?: Extract<keyof T, string>[][];
 		},
 		columns: T
 	) {
@@ -230,7 +230,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 			GenerateQueryOptions<Partial<InferFromColumns<T>>>,
 			"data" | "upsertOnlyUpdateData"
 		>
-	): Promise<D1Result<InferFromColumns<T>[]>> {
+	): Promise<D1Result<InferFromColumns<T>>> {
 		const statement = GenerateQuery(QueryType.SELECT, this.tableName, options);
 		return this.#D1Orm
 			.prepare(statement.query)
@@ -278,7 +278,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 			GenerateQueryOptions<Partial<InferFromColumns<T>>>,
 			"where" | "data" | "upsertOnlyUpdateData"
 		>
-	) {
+	): Promise<D1Result<unknown>> {
 		const statement = GenerateQuery(
 			QueryType.UPSERT,
 			this.tableName,
@@ -294,7 +294,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 
 /**
  * The definition of a column in a model.
- * If the `defaultValue` is provided, it should be of the type defined by your `type`. Blobs should be provided as a [Uint32Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array).
+ * If the `defaultValue` is provided, it should be of the type defined by your `type`. Blobs should be provided as an [ArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer).
  */
 export type ModelColumn = {
 	type: DataTypes;
