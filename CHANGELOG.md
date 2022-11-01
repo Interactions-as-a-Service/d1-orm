@@ -1,5 +1,15 @@
 # d1-orm
 
+## 0.6.0
+
+### Minor Changes
+
+- [#55](https://github.com/Interactions-as-a-Service/d1-orm/pull/55) [`5e30824`](https://github.com/Interactions-as-a-Service/d1-orm/commit/5e308247f77ab8ee05879a438c0a1d5ec3d3646e) Thanks [@Skye-31](https://github.com/Skye-31)! - [breaking] Feat: Refactor models to allow multiple unique keys
+
+  This change restructures the way that primary keys, auto increment keys and unique keys are provided. This allows for multiple unique keys to be provided for a model. These fields have been moved from the ModelColumn type to the first parameter in the Model constructor.
+
+  Refer to [the docs](https://docs.interactions.rest/d1-orm/) for more information.
+
 ## 0.5.5
 
 ### Patch Changes
