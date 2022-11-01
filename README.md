@@ -2,9 +2,9 @@
 
 ✨ A simple, strictly typed ORM, to assist you in using [Cloudflare's D1 product](https://blog.cloudflare.com/introducing-d1/)
 
-API reference can be found at https://d1-orm.pages.dev/modules
+Docs can be found at https://docs.interactions.rest/d1-orm/
 
-Docs can be found at https://d1-orm.pages.dev/guides
+API reference can be found at https://orm.interactions.rest/modules
 
 ## Installation
 
@@ -34,12 +34,13 @@ export default {
 			{
 				D1Orm: orm,
 				tableName: "users",
+				primaryKey: "id",
+				autoIncrement: "id",
+				uniqueKeys: [["email"]],
 			},
 			{
 				id: {
 					type: DataTypes.INTEGER,
-					primaryKey: true,
-					autoIncrement: true,
 					notNull: true,
 				},
 				name: {
@@ -49,7 +50,6 @@ export default {
 				},
 				email: {
 					type: DataTypes.STRING,
-					unique: true,
 				},
 			}
 		);
@@ -65,4 +65,4 @@ export default {
 };
 ```
 
-For more information, refer to the [docs](https://d1-orm.pages.dev/guides).
+For more information, refer to the [docs](https://docs.interactions.rest/d1-orm).

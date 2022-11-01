@@ -34,7 +34,11 @@ export class D1Orm implements D1Database {
 	}
 }
 
-function isDatabase(database: unknown): database is D1Database {
+/**
+ * @private
+ * @hidden
+ */
+export function isDatabase(database: unknown): database is D1Database {
 	return (
 		!!database &&
 		["prepare", "dump", "batch", "exec"].every(
