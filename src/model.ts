@@ -296,11 +296,11 @@ export class Model<T extends Record<string, ModelColumn>> {
  * The definition of a column in a model.
  * If the `defaultValue` is provided, it should be of the type defined by your `type`. Blobs should be provided as an [ArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer).
  */
-export type ModelColumn = {
+export interface ModelColumn {
 	type: DataTypes;
 	notNull?: boolean;
 	defaultValue?: unknown;
-};
+}
 
 /**
  * @enum {string} Aliases for DataTypes used in a {@link ModelColumn} definition.

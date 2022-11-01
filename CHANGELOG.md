@@ -137,7 +137,7 @@
 
 ### Patch Changes
 
-- f32ff3c: Add typedoc to generate docs, see https://d1-orm.pages.dev
+- f32ff3c: Add typedoc to generate docs, see https://orm.interactions.rest
 
 ## 0.1.1
 
