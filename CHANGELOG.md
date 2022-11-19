@@ -1,5 +1,11 @@
 # d1-orm
 
+## 0.7.0
+
+### Minor Changes
+
+- [#57](https://github.com/Interactions-as-a-Service/d1-orm/pull/57) [`75f58c0`](https://github.com/Interactions-as-a-Service/d1-orm/commit/75f58c0135aeec838caec4a7d447296cff1dab06) Thanks [@Skye-31](https://github.com/Skye-31)! - Feat: Make `new Model()` option for ORM optional. Add Model.D1Orm getter & Model.SetOrm() to allow people to provide an orm after the constructor has been initialised
+
 ## 0.6.0
 
 ### Minor Changes
