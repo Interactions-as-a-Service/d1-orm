@@ -9,7 +9,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 	/**
 	 * @param options - The options for the model. All parameters except autoIncrement and uniqueKeys are required.
 	 * @param options.tableName - The name of the table to use.
-	 * @param options.D1Orm - The D1Orm instance to use.
+	 * @param options.D1Orm - The D1Orm instance to use - optional. If not set initially, you must use SetOrm() to set before querying.
 	 * @param options.primaryKeys - The primary key or keys of the table.
 	 * @param options.autoIncrement - The column to use for auto incrementing. If specified, only one primary key is allowed, and must be of type INTEGER.
 	 * @param options.uniqueKeys - The unique keys of the table. For example `[ ['id'], ['username', 'discriminator'] ]` would cause ID to be unique, as well as the combination of username and discriminator.
@@ -17,7 +17,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 	 */
 	constructor(
 		options: {
-			D1Orm: D1Orm;
+			D1Orm?: D1Orm;
 			tableName: string;
 			primaryKeys: Extract<keyof T, string> | Extract<keyof T, string>[];
 			autoIncrement?: Extract<keyof T, string>;
@@ -25,7 +25,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 		},
 		columns: T
 	) {
-		this.#D1Orm = options.D1Orm;
+		this.#D1Orm = options.D1Orm ?? null;
 		this.tableName = options.tableName;
 		this.columns = columns;
 		this.primaryKeys = Array.isArray(options.primaryKeys)
@@ -34,7 +34,10 @@ export class Model<T extends Record<string, ModelColumn>> {
 		this.#autoIncrementColumn = options.autoIncrement;
 		this.uniqueKeys = options.uniqueKeys || [];
 
-		if (!(this.#D1Orm instanceof D1Orm) || !isDatabase(this.#D1Orm)) {
+		if (
+			this.#D1Orm &&
+			(!(this.#D1Orm instanceof D1Orm) || !isDatabase(this.#D1Orm))
+		) {
 			throw new Error("Options.D1Orm is not an instance of D1Orm");
 		}
 		if (typeof this.tableName !== "string" || !this.tableName.length) {
@@ -92,8 +95,29 @@ export class Model<T extends Record<string, ModelColumn>> {
 	public readonly columns: T;
 	public readonly primaryKeys: Extract<keyof T, string>[];
 	public readonly uniqueKeys: Extract<keyof T, string>[][];
-	readonly #D1Orm: D1Orm;
+	#D1Orm: D1Orm | null;
 	readonly #autoIncrementColumn?: Extract<keyof T, string>;
+
+	/**
+	 * @returns The ORM instance that this model is using.
+	 */
+	get D1Orm(): D1Orm {
+		if (!this.#D1Orm) {
+			throw new Error("D1Orm has not been set");
+		}
+		return this.#D1Orm;
+	}
+
+	/**
+	 * @param orm The ORM instance to associate this model with.
+	 */
+	public SetOrm(orm: D1Orm): this {
+		if (!(orm instanceof D1Orm) || !isDatabase(orm)) {
+			throw new Error("Options.D1Orm is not an instance of D1Orm");
+		}
+		this.#D1Orm = orm;
+		return this;
+	}
 
 	/**
 	 * @returns A CreateTable definition for the model, which can be used in a CREATE TABLE statement.
@@ -150,7 +174,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 		if (strategy === "force") {
 			statement = `DROP TABLE IF EXISTS \`${this.tableName}\`\n${statement}`;
 		}
-		return this.#D1Orm.exec(statement);
+		return this.D1Orm.exec(statement);
 	}
 
 	/**
@@ -158,9 +182,9 @@ export class Model<T extends Record<string, ModelColumn>> {
 	 */
 	public async DropTable(silent?: boolean): Promise<D1Result<unknown>> {
 		if (silent) {
-			return this.#D1Orm.exec(`DROP TABLE IF EXISTS ${this.tableName};`);
+			return this.D1Orm.exec(`DROP TABLE IF EXISTS ${this.tableName};`);
 		}
-		return this.#D1Orm.exec(`DROP TABLE ${this.tableName};`);
+		return this.D1Orm.exec(`DROP TABLE ${this.tableName};`);
 	}
 
 	/**
@@ -172,8 +196,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 	): Promise<D1Result<InferFromColumns<T>>> {
 		const qt = orReplace ? QueryType.INSERT_OR_REPLACE : QueryType.INSERT;
 		const statement = GenerateQuery(qt, this.tableName, { data });
-		return this.#D1Orm
-			.prepare(statement.query)
+		return this.D1Orm.prepare(statement.query)
 			.bind(...statement.bindings)
 			.run();
 	}
@@ -191,9 +214,9 @@ export class Model<T extends Record<string, ModelColumn>> {
 			const stmt = GenerateQuery(qt, this.tableName, {
 				data: row,
 			});
-			stmts.push(this.#D1Orm.prepare(stmt.query).bind(...stmt.bindings));
+			stmts.push(this.D1Orm.prepare(stmt.query).bind(...stmt.bindings));
 		}
-		return this.#D1Orm.batch(stmts);
+		return this.D1Orm.batch(stmts);
 	}
 
 	/**
@@ -209,8 +232,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 			Object.assign(options, { limit: 1 })
 		);
 		try {
-			return await this.#D1Orm
-				.prepare(statement.query)
+			return await this.D1Orm.prepare(statement.query)
 				.bind(...statement.bindings)
 				.first<InferFromColumns<T>>();
 		} catch (e) {
@@ -232,8 +254,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 		>
 	): Promise<D1Result<InferFromColumns<T>>> {
 		const statement = GenerateQuery(QueryType.SELECT, this.tableName, options);
-		return this.#D1Orm
-			.prepare(statement.query)
+		return this.D1Orm.prepare(statement.query)
 			.bind(...statement.bindings)
 			.all();
 	}
@@ -245,8 +266,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 		options: Pick<GenerateQueryOptions<Partial<InferFromColumns<T>>>, "where">
 	): Promise<D1Result<unknown>> {
 		const statement = GenerateQuery(QueryType.DELETE, this.tableName, options);
-		return this.#D1Orm
-			.prepare(statement.query)
+		return this.D1Orm.prepare(statement.query)
 			.bind(...statement.bindings)
 			.run();
 	}
@@ -262,8 +282,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 		>
 	): Promise<D1Result<unknown>> {
 		const statement = GenerateQuery(QueryType.UPDATE, this.tableName, options);
-		return this.#D1Orm
-			.prepare(statement.query)
+		return this.D1Orm.prepare(statement.query)
 			.bind(...statement.bindings)
 			.run();
 	}
@@ -285,8 +304,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 			options,
 			this.primaryKeys
 		);
-		return this.#D1Orm
-			.prepare(statement.query)
+		return this.D1Orm.prepare(statement.query)
 			.bind(...statement.bindings)
 			.run();
 	}

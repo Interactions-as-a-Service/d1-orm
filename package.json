@@ -30,6 +30,7 @@
 	"scripts": {
 		"build": "tsc",
 		"build:docs": "typedoc",
+		"changeset": "changeset",
 		"check:format": "prettier . --check --ignore-unknown --end-of-line lf",
 		"check:lint": "eslint src/*.ts --cache --cache-strategy content --max-warnings=0",
 		"docs:watch": "typedoc --watch",

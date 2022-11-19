@@ -26,14 +26,14 @@ describe("Model Validation", () => {
 		});
 		describe("Primary keys", () => {
 			it("should throw an error if no primary keys are provided", () => {
-				expect(() => new Model({ D1Orm: orm, tableName: "aaa" })).to.throw(
+				expect(() => new Model({ D1Orm: orm, tableName: "users" })).to.throw(
 					Error,
 					"Options.primaryKeys must be a string or an array of strings"
 				);
 			});
 			it("should throw an error if the primary keys are not strings", () => {
 				expect(
-					() => new Model({ D1Orm: orm, tableName: "aaa", primaryKeys: [1] })
+					() => new Model({ D1Orm: orm, tableName: "users", primaryKeys: [1] })
 				).to.throw(
 					Error,
 					"Options.primaryKeys must be a string or an array of strings"
@@ -43,7 +43,7 @@ describe("Model Validation", () => {
 				expect(
 					() =>
 						new Model(
-							{ D1Orm: orm, tableName: "aaa", primaryKeys: ["aaa"] },
+							{ D1Orm: orm, tableName: "users", primaryKeys: ["users"] },
 							{ id: { type: DataTypes.INTEGER } }
 						)
 				).to.throw(
@@ -59,7 +59,7 @@ describe("Model Validation", () => {
 						new Model(
 							{
 								D1Orm: orm,
-								tableName: "aaa",
+								tableName: "users",
 								primaryKeys: "id",
 								autoIncrement: 1,
 							},
@@ -76,7 +76,7 @@ describe("Model Validation", () => {
 						new Model(
 							{
 								D1Orm: orm,
-								tableName: "aaa",
+								tableName: "users",
 								primaryKeys: "id",
 								autoIncrement: "notId",
 							},
@@ -93,7 +93,7 @@ describe("Model Validation", () => {
 						new Model(
 							{
 								D1Orm: orm,
-								tableName: "aaa",
+								tableName: "users",
 								primaryKeys: ["id", "id2"],
 								autoIncrement: "id",
 							},
@@ -113,7 +113,7 @@ describe("Model Validation", () => {
 						new Model(
 							{
 								D1Orm: orm,
-								tableName: "aaa",
+								tableName: "users",
 								primaryKeys: "id",
 								autoIncrement: "id",
 							},
@@ -128,6 +128,42 @@ describe("Model Validation", () => {
 					"Options.autoIncrement was provided, but is not an integer column"
 				);
 			});
+		});
+		it("should accept no ORM being set", () => {
+			expect(
+				() =>
+					new Model(
+						{ tableName: "users", primaryKeys: "id" },
+						{ id: { type: DataTypes.INTEGER } }
+					)
+			).to.not.throw();
+		});
+	});
+	describe("SetOrm", () => {
+		it("should throw if the ORM is not an instance of D1Orm", () => {
+			expect(() =>
+				new Model(
+					{ tableName: "users", primaryKeys: "id" },
+					{ id: { type: DataTypes.INTEGER } }
+				).SetOrm({})
+			).to.throw(Error, "Options.D1Orm is not an instance of D1Orm");
+		});
+		it("should accept an instance of D1Orm", () => {
+			expect(() =>
+				new Model(
+					{ tableName: "users", primaryKeys: "id" },
+					{ id: { type: DataTypes.INTEGER } }
+				).SetOrm(orm)
+			).to.not.throw();
+		});
+		it("should stop the getter from erroring", () => {
+			const model = new Model(
+				{ tableName: "users", primaryKeys: "id" },
+				{ id: { type: DataTypes.INTEGER } }
+			);
+			expect(() => model.D1Orm).to.throw();
+			model.SetOrm(orm);
+			expect(() => model.D1Orm).to.not.throw();
 		});
 	});
 });
