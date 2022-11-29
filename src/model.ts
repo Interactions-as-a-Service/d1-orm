@@ -224,7 +224,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 	 * @returns Returns the first row that matches the where clause, or null if no rows match.
 	 */
 	public async First(
-		options: Pick<GenerateQueryOptions<Partial<InferFromColumns<T>>>, "where">
+		options: Pick<GenerateQueryOptions<InferFromColumns<T>>, "where">
 	): Promise<InferFromColumns<T> | null> {
 		const statement = GenerateQuery(
 			QueryType.SELECT,
@@ -249,7 +249,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 	 */
 	public async All(
 		options: Omit<
-			GenerateQueryOptions<Partial<InferFromColumns<T>>>,
+			GenerateQueryOptions<InferFromColumns<T>>,
 			"data" | "upsertOnlyUpdateData"
 		>
 	): Promise<D1Result<InferFromColumns<T>>> {
@@ -263,7 +263,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 	 * @param options The options for the query, see {@link GenerateQueryOptions}
 	 */
 	public async Delete(
-		options: Pick<GenerateQueryOptions<Partial<InferFromColumns<T>>>, "where">
+		options: Pick<GenerateQueryOptions<InferFromColumns<T>>, "where">
 	): Promise<D1Result<unknown>> {
 		const statement = GenerateQuery(QueryType.DELETE, this.tableName, options);
 		return this.D1Orm.prepare(statement.query)
@@ -276,10 +276,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 	 * @throws Throws an error if the data clause is empty.
 	 */
 	public async Update(
-		options: Pick<
-			GenerateQueryOptions<Partial<InferFromColumns<T>>>,
-			"where" | "data"
-		>
+		options: Pick<GenerateQueryOptions<InferFromColumns<T>>, "where" | "data">
 	): Promise<D1Result<unknown>> {
 		const statement = GenerateQuery(QueryType.UPDATE, this.tableName, options);
 		return this.D1Orm.prepare(statement.query)
@@ -294,7 +291,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 	 */
 	public async Upsert(
 		options: Pick<
-			GenerateQueryOptions<Partial<InferFromColumns<T>>>,
+			GenerateQueryOptions<InferFromColumns<T>>,
 			"where" | "data" | "upsertOnlyUpdateData"
 		>
 	): Promise<D1Result<unknown>> {
