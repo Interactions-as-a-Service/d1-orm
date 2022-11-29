@@ -1,5 +1,11 @@
 # d1-orm
 
+## 0.7.1
+
+### Patch Changes
+
+- [`30b38c7`](https://github.com/Interactions-as-a-Service/d1-orm/commit/30b38c7d32e6bca3397703c986222f4e0c51b0c8) Thanks [@Skye-31](https://github.com/Skye-31)! - Fix: Unnecessary double partial in some Model queries
+
 ## 0.7.0
 
 ### Minor Changes
