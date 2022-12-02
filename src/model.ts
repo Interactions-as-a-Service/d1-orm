@@ -135,7 +135,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 			if (column.defaultValue !== undefined) {
 				let defaultStr = `${column.defaultValue}`;
 				if (typeof column.defaultValue === "string") {
-					defaultStr = `"${column.defaultValue}"`;
+					defaultStr = `'${column.defaultValue}'`;
 				}
 				definition += ` DEFAULT ${defaultStr}`;
 			}

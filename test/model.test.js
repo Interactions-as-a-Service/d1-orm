@@ -281,7 +281,7 @@ describe("Model > Create Tables", () => {
 				}
 			);
 			expect(model.createTableDefinition).to.equal(
-				'CREATE TABLE `test` (id integer, is_admin text DEFAULT "test", PRIMARY KEY (id));'
+				"CREATE TABLE `test` (id integer, is_admin text DEFAULT 'test', PRIMARY KEY (id));"
 			);
 		});
 		it("should support a number", () => {
