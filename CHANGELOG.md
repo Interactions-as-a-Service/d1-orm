@@ -1,5 +1,11 @@
 # d1-orm
 
+## 0.7.2
+
+### Patch Changes
+
+- [#61](https://github.com/Interactions-as-a-Service/d1-orm/pull/61) [`921aef0`](https://github.com/Interactions-as-a-Service/d1-orm/commit/921aef093b4af2f9932ef71a2315d33fb4f4dea9) Thanks [@Skye-31](https://github.com/Skye-31)! - Chore: use single quotes in the create table definition of a model
+
 ## 0.7.1
 
 ### Patch Changes
