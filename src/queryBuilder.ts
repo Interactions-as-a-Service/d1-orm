@@ -32,6 +32,7 @@ export type GenerateQueryOptions<T extends object> = {
 	orderBy?: OrderBy<T> | OrderBy<T>[];
 	data?: Partial<T>;
 	upsertOnlyUpdateData?: Partial<T>;
+	uniqueColumn?: string;
 };
 
 /**
@@ -171,9 +172,10 @@ export function GenerateQuery<T extends object>(
 				.split("")
 				.join(", ")})`;
 
-			const primaryKeyStr = Array.isArray(primaryKeys)
+			const primaryKeyStr = options.uniqueColumn || (Array.isArray(primaryKeys)
 				? primaryKeys.join(", ")
-				: primaryKeys;
+				: primaryKeys);
+
 			query += ` ON CONFLICT (${primaryKeyStr}) DO UPDATE SET`;
 			query += ` ${updateDataKeys.map((key) => `${key} = ?`).join(", ")}`;
 			query += ` WHERE ${whereKeys.map((key) => `${key} = ?`).join(" AND ")}`;

@@ -291,6 +291,15 @@ describe("Query Builder", () => {
 						upsertOnlyUpdateData: { id: 1 },
 					})
 				).to.not.throw();
+
+				expect(() =>
+					GenerateQuery(QueryType.UPSERT, "test", {
+						data: { id: 1 },
+						where: { id: 1 },
+						upsertOnlyUpdateData: { id: 1 },
+						uniqueColumn: 'email'
+					})
+				).to.not.throw();
 			});
 			it("should generate a basic query", () => {
 				const statement = GenerateQuery(QueryType.UPSERT, "test", {
