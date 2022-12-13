@@ -34,7 +34,7 @@ export default {
 			{
 				D1Orm: orm,
 				tableName: "users",
-				primaryKey: "id",
+				primaryKeys: "id",
 				autoIncrement: "id",
 				uniqueKeys: [["email"]],
 			},
