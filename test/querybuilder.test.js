@@ -176,6 +176,26 @@ describe("Query Builder", () => {
 				expect(statement.bindings[0]).to.equal(1);
 				expect(statement.bindings[1]).to.equal("test");
 			});
+			it("can write JSON with a column config", () => {
+				const address = { line1: '1000 N. Main St.', city: 'New York', state: 'NY' }
+				const statement = GenerateQuery(QueryType.INSERT, "test", {
+					data: {
+						id: 1,
+						name: "test",
+						address
+					},
+					columns: {
+						address: { type: 'text', json: true }
+					}
+				});
+				expect(statement.query).to.equal(
+					"INSERT INTO `test` (id, name, address) VALUES (?, ?, json(?))"
+				);
+				expect(statement.bindings.length).to.equal(3);
+				expect(statement.bindings[0]).to.equal(1);
+				expect(statement.bindings[1]).to.equal("test");
+				expect(statement.bindings[2]).to.equal(JSON.stringify(address));
+			});
 		});
 		describe(QueryType.INSERT_OR_REPLACE, () => {
 			it("should throw an error if no data is provided", () => {
@@ -208,6 +228,26 @@ describe("Query Builder", () => {
 				expect(statement.bindings.length).to.equal(2);
 				expect(statement.bindings[0]).to.equal(1);
 				expect(statement.bindings[1]).to.equal("test");
+			});
+			it("can write JSON with a column config", () => {
+				const address = { line1: '1000 N. Main St.', city: 'New York', state: 'NY' }
+				const statement = GenerateQuery(QueryType.INSERT_OR_REPLACE, "test", {
+					data: {
+						id: 1,
+						name: "test",
+						address
+					},
+					columns: {
+						address: { type: 'text', json: true }
+					}
+				});
+				expect(statement.query).to.equal(
+					"INSERT or REPLACE INTO `test` (id, name, address) VALUES (?, ?, json(?))"
+				);
+				expect(statement.bindings.length).to.equal(3);
+				expect(statement.bindings[0]).to.equal(1);
+				expect(statement.bindings[1]).to.equal("test");
+				expect(statement.bindings[2]).to.equal(JSON.stringify(address));
 			});
 		});
 		describe(QueryType.UPDATE, () => {

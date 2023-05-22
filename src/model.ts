@@ -5,7 +5,7 @@ import type { GenerateQueryOptions } from "./queryBuilder.js";
 /**
  * @typeParam T - The type of the model, which will be returned when using methods such as First() or All()
  */
-export class Model<T extends Record<string, ModelColumn>> {
+export class Model<T extends ModelColumns> {
 	/**
 	 * @param options - The options for the model. All parameters except autoIncrement and uniqueKeys are required.
 	 * @param options.tableName - The name of the table to use.
@@ -195,7 +195,10 @@ export class Model<T extends Record<string, ModelColumn>> {
 		orReplace = false
 	): Promise<D1Result<InferFromColumns<T>>> {
 		const qt = orReplace ? QueryType.INSERT_OR_REPLACE : QueryType.INSERT;
-		const statement = GenerateQuery(qt, this.tableName, { data });
+		const statement = GenerateQuery(qt, this.tableName, {
+			data,
+			columns: this.columns,
+		});
 		return this.D1Orm.prepare(statement.query)
 			.bind(...statement.bindings)
 			.run();
@@ -315,7 +318,9 @@ export interface ModelColumn {
 	type: DataTypes;
 	notNull?: boolean;
 	defaultValue?: unknown;
+	json?: boolean;
 }
+export type ModelColumns = Record<string, ModelColumn>;
 
 /**
  * @enum {string} Aliases for DataTypes used in a {@link ModelColumn} definition.

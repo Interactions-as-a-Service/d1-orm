@@ -1,3 +1,5 @@
+import type { ModelColumns } from "./model";
+
 /**
  * @enum {string} - The type of the query
  */
@@ -32,6 +34,7 @@ export type GenerateQueryOptions<T extends object> = {
 	orderBy?: OrderBy<T> | OrderBy<T>[];
 	data?: Partial<T>;
 	upsertOnlyUpdateData?: Partial<T>;
+	columns?: ModelColumns;
 };
 
 /**
@@ -112,14 +115,19 @@ export function GenerateQuery<T extends object>(
 				throw new Error("Must provide data to insert");
 			}
 			const keys = [];
+			const values = [];
 			for (const [key, value] of Object.entries(options.data)) {
+				const column = options.columns?.[key];
 				keys.push(key);
-				bindings.push(value);
+				if (column?.json) {
+					bindings.push(JSON.stringify(value));
+					values.push(`json(?)`);
+				} else {
+					bindings.push(value);
+					values.push("?");
+				}
 			}
-			query += ` (${keys.join(", ")}) VALUES (${"?"
-				.repeat(keys.length)
-				.split("")
-				.join(", ")})`;
+			query += ` (${keys.join(", ")}) VALUES (${values.join(", ")})`;
 			break;
 		}
 		case QueryType.UPDATE: {
