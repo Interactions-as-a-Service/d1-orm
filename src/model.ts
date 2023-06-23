@@ -224,12 +224,17 @@ export class Model<T extends Record<string, ModelColumn>> {
 	 * @returns Returns the first row that matches the where clause, or null if no rows match.
 	 */
 	public async First(
-		options: Pick<GenerateQueryOptions<InferFromColumns<T>>, "where" | "columns">
+		options: Pick<
+			GenerateQueryOptions<InferFromColumns<T>>,
+			"where" | "columns"
+		>
 	): Promise<InferFromColumns<T> | null> {
 		const statement = GenerateQuery(
 			QueryType.SELECT,
 			this.tableName,
-			Object.assign(options, { limit: 1 }) as GenerateQueryOptions<InferFromColumns<T>>
+			Object.assign(options, { limit: 1 }) as GenerateQueryOptions<
+				InferFromColumns<T>
+			>
 		);
 		try {
 			return await this.D1Orm.prepare(statement.query)

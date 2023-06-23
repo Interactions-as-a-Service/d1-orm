@@ -114,9 +114,9 @@ describe("Query Builder", () => {
 			});
 			it("should generate a query with a select columns", () => {
 				const statement = GenerateQuery(QueryType.SELECT, "test", {
-					columns: ["id", "name"]
+					columns: ["id", "name"],
 				});
-				expect(statement.query).to.equal("SELECT `id`, `name` FROM `test`");
+				expect(statement.query).to.equal('SELECT "id", "name" FROM `test`');
 			});
 			it("should ignore an empty where clause object", () => {
 				const statement = GenerateQuery(QueryType.SELECT, "test", {

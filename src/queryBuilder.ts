@@ -23,7 +23,7 @@ export enum QueryType {
  * **data** - The data to insert, or update with. This is an object with the column names as keys and the values as values. In the case of Upsert, `upsertOnlyUpdateData` is also required, and that will be the data to update with, if an `ON CONFLICT` clause is matched.
  *
  * **columns** - The columns to select. This is an array of column names.
- * 
+ *
  * **upsertOnlyUpdateData** - The data to update with, if an `ON CONFLICT` clause is matched. This is an object with the column names as keys and the values as values.
  * @typeParam T - The type of the object to query. This is generally not needed to be specified, but can be useful if you're calling this yourself instead of through a {@link Model}.
  */
@@ -75,7 +75,7 @@ export function GenerateQuery<T extends object>(
 		case QueryType.SELECT: {
 			let columns = "*";
 			if (options.columns && options.columns.length > 0) {
-				columns = options.columns.map((x) => `\`${String(x)}\``).join(", ");
+				columns = options.columns.map((x) => `"${String(x)}"`).join(", ");
 			}
 			query = `SELECT ${columns} FROM \`${tableName}\``;
 			if (options.where) {
