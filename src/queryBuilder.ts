@@ -22,7 +22,7 @@ export enum QueryType {
  *
  * **data** - The data to insert, or update with. This is an object with the column names as keys and the values as values. In the case of Upsert, `upsertOnlyUpdateData` is also required, and that will be the data to update with, if an `ON CONFLICT` clause is matched.
  *
- * **select** - The columns to select. This is an array of column names.
+ * **columns** - The columns to select. This is an array of column names.
  * 
  * **upsertOnlyUpdateData** - The data to update with, if an `ON CONFLICT` clause is matched. This is an object with the column names as keys and the values as values.
  * @typeParam T - The type of the object to query. This is generally not needed to be specified, but can be useful if you're calling this yourself instead of through a {@link Model}.
@@ -33,7 +33,7 @@ export type GenerateQueryOptions<T extends object> = {
 	offset?: number;
 	orderBy?: OrderBy<T> | OrderBy<T>[];
 	data?: Partial<T>;
-	select?: (keyof T)[];
+	columns?: (keyof T)[];
 	upsertOnlyUpdateData?: Partial<T>;
 };
 
@@ -73,11 +73,11 @@ export function GenerateQuery<T extends object>(
 	const bindings: unknown[] = [];
 	switch (type) {
 		case QueryType.SELECT: {
-			let select = "*";
-			if (options.select && options.select.length > 0) {
-				select = options.select.map((x) => `"${String(x)}"`).join(", ");
+			let columns = "*";
+			if (options.columns && options.columns.length > 0) {
+				columns = options.columns.map((x) => `\`${String(x)}\``).join(", ");
 			}
-			query = `SELECT ${select} FROM \`${tableName}\``;
+			query = `SELECT ${columns} FROM \`${tableName}\``;
 			if (options.where) {
 				const whereStmt = [];
 				for (const [key, value] of Object.entries(options.where)) {
