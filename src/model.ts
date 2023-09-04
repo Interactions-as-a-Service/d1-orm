@@ -149,7 +149,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 		}
 		return `CREATE TABLE \`${this.tableName}\` (${columnDefinition.join(
 			", "
-		)});`;
+		)})${this.#autoIncrementColumn ? "" : " WITHOUT ROWID"};`;
 	}
 
 	/**
