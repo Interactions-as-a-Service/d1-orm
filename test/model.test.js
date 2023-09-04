@@ -24,6 +24,24 @@ describe("Model Validation", () => {
 				"Options.tableName must be a string"
 			);
 		});
+		it("should throw if autoincrement and withRowId are both set", () => {
+			expect(
+				() =>
+					new Model(
+						{
+							D1Orm: orm,
+							tableName: "users",
+							primaryKeys: "id",
+							autoIncrement: "id",
+							withRowId: true,
+						},
+						{ id: { type: DataTypes.INTEGER } }
+					)
+			).to.throw(
+				Error,
+				"Options.autoIncrement and Options.withRowId cannot both be set"
+			);
+		});
 		describe("Primary keys", () => {
 			it("should throw an error if no primary keys are provided", () => {
 				expect(() => new Model({ D1Orm: orm, tableName: "users" })).to.throw(
@@ -216,6 +234,18 @@ describe("Model > Create Tables", () => {
 		);
 		expect(model.createTableDefinition).to.equal(
 			"CREATE TABLE `test` (id integer PRIMARY KEY AUTOINCREMENT, name text);"
+		);
+	});
+	it("should not include WITHOUT ROWID", () => {
+		const model = new Model(
+			{ D1Orm: orm, tableName: "test", primaryKeys: "id", withRowId: true },
+			{
+				id: { type: DataTypes.INTEGER },
+				is_admin: { type: DataTypes.STRING },
+			}
+		);
+		expect(model.createTableDefinition).to.equal(
+			"CREATE TABLE `test` (id integer, is_admin text, PRIMARY KEY (id));"
 		);
 	});
 	describe("Unique Constraints", () => {

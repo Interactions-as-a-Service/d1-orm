@@ -13,6 +13,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 	 * @param options.primaryKeys - The primary key or keys of the table.
 	 * @param options.autoIncrement - The column to use for auto incrementing. If specified, only one primary key is allowed, and must be of type INTEGER.
 	 * @param options.uniqueKeys - The unique keys of the table. For example `[ ['id'], ['username', 'discriminator'] ]` would cause ID to be unique, as well as the combination of username and discriminator.
+	 * @param options.withRowId - Whether or not D1 should generate a `rowid` column automatically. Defaults to false.
 	 * @param columns - The columns for the model. The keys are the column names, and the values are the column options. See {@link ModelColumn}
 	 */
 	constructor(
@@ -22,6 +23,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 			primaryKeys: Extract<keyof T, string> | Extract<keyof T, string>[];
 			autoIncrement?: Extract<keyof T, string>;
 			uniqueKeys?: Extract<keyof T, string>[][];
+			withRowId?: boolean;
 		},
 		columns: T
 	) {
@@ -33,6 +35,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 			: [options.primaryKeys].filter(Boolean);
 		this.#autoIncrementColumn = options.autoIncrement;
 		this.uniqueKeys = options.uniqueKeys || [];
+		this.#withRowId = options.withRowId ?? false;
 
 		if (
 			this.#D1Orm &&
@@ -51,6 +54,11 @@ export class Model<T extends Record<string, ModelColumn>> {
 				"Options.primaryKeys must be a string or an array of strings"
 			);
 		}
+
+		if(this.#withRowId && this.#autoIncrementColumn) {
+			throw new Error("Options.autoIncrement and Options.withRowId cannot both be set");
+		}
+
 		if (!columns) {
 			throw new Error("Model columns must be defined");
 		}
@@ -97,6 +105,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 	public readonly uniqueKeys: Extract<keyof T, string>[][];
 	#D1Orm: D1Orm | null;
 	readonly #autoIncrementColumn?: Extract<keyof T, string>;
+	readonly #withRowId: boolean;
 
 	/**
 	 * @returns The ORM instance that this model is using.
@@ -149,7 +158,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 		}
 		return `CREATE TABLE \`${this.tableName}\` (${columnDefinition.join(
 			", "
-		)})${this.#autoIncrementColumn ? "" : " WITHOUT ROWID"};`;
+		)})${this.#autoIncrementColumn || this.#withRowId ? "" : " WITHOUT ROWID"};`;
 	}
 
 	/**
