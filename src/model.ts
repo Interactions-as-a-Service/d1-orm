@@ -55,8 +55,10 @@ export class Model<T extends Record<string, ModelColumn>> {
 			);
 		}
 
-		if(this.#withRowId && this.#autoIncrementColumn) {
-			throw new Error("Options.autoIncrement and Options.withRowId cannot both be set");
+		if (this.#withRowId && this.#autoIncrementColumn) {
+			throw new Error(
+				"Options.autoIncrement and Options.withRowId cannot both be set"
+			);
 		}
 
 		if (!columns) {
@@ -158,7 +160,9 @@ export class Model<T extends Record<string, ModelColumn>> {
 		}
 		return `CREATE TABLE \`${this.tableName}\` (${columnDefinition.join(
 			", "
-		)})${this.#autoIncrementColumn || this.#withRowId ? "" : " WITHOUT ROWID"};`;
+		)})${
+			this.#autoIncrementColumn || this.#withRowId ? "" : " WITHOUT ROWID"
+		};`;
 	}
 
 	/**
