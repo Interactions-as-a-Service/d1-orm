@@ -7,7 +7,7 @@ import type { GenerateQueryOptions } from "./queryBuilder.js";
  */
 export class Model<T extends Record<string, ModelColumn>> {
 	/**
-	 * @param options - The options for the model. All parameters except autoIncrement and uniqueKeys are required.
+	 * @param options - The options for the model. All parameters except autoIncrement, withRowId, and uniqueKeys are required.
 	 * @param options.tableName - The name of the table to use.
 	 * @param options.D1Orm - The D1Orm instance to use - optional. If not set initially, you must use SetOrm() to set before querying.
 	 * @param options.primaryKeys - The primary key or keys of the table.
