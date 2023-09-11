@@ -24,6 +24,24 @@ describe("Model Validation", () => {
 				"Options.tableName must be a string"
 			);
 		});
+		it("should throw if autoincrement and withRowId are both set", () => {
+			expect(
+				() =>
+					new Model(
+						{
+							D1Orm: orm,
+							tableName: "users",
+							primaryKeys: "id",
+							autoIncrement: "id",
+							withRowId: true,
+						},
+						{ id: { type: DataTypes.INTEGER } }
+					)
+			).to.throw(
+				Error,
+				"Options.autoIncrement and Options.withRowId cannot both be set"
+			);
+		});
 		describe("Primary keys", () => {
 			it("should throw an error if no primary keys are provided", () => {
 				expect(() => new Model({ D1Orm: orm, tableName: "users" })).to.throw(
@@ -191,7 +209,7 @@ describe("Model > Create Tables", () => {
 			}
 		);
 		expect(model.createTableDefinition).to.equal(
-			"CREATE TABLE `test` (id integer, name text, PRIMARY KEY (id, name));"
+			"CREATE TABLE `test` (id integer, name text, PRIMARY KEY (id, name)) WITHOUT ROWID;"
 		);
 	});
 	it("should support a not null constraint", () => {
@@ -203,7 +221,7 @@ describe("Model > Create Tables", () => {
 			}
 		);
 		expect(model.createTableDefinition).to.equal(
-			"CREATE TABLE `test` (id integer, name text NOT NULL, PRIMARY KEY (id));"
+			"CREATE TABLE `test` (id integer, name text NOT NULL, PRIMARY KEY (id)) WITHOUT ROWID;"
 		);
 	});
 	it("should support a valid autoIncrement constraint", () => {
@@ -216,6 +234,18 @@ describe("Model > Create Tables", () => {
 		);
 		expect(model.createTableDefinition).to.equal(
 			"CREATE TABLE `test` (id integer PRIMARY KEY AUTOINCREMENT, name text);"
+		);
+	});
+	it("should not include WITHOUT ROWID", () => {
+		const model = new Model(
+			{ D1Orm: orm, tableName: "test", primaryKeys: "id", withRowId: true },
+			{
+				id: { type: DataTypes.INTEGER },
+				is_admin: { type: DataTypes.STRING },
+			}
+		);
+		expect(model.createTableDefinition).to.equal(
+			"CREATE TABLE `test` (id integer, is_admin text, PRIMARY KEY (id));"
 		);
 	});
 	describe("Unique Constraints", () => {
@@ -233,7 +263,7 @@ describe("Model > Create Tables", () => {
 				}
 			);
 			expect(model.createTableDefinition).to.equal(
-				"CREATE TABLE `test` (id integer, name text, PRIMARY KEY (id), UNIQUE (id));"
+				"CREATE TABLE `test` (id integer, name text, PRIMARY KEY (id), UNIQUE (id)) WITHOUT ROWID;"
 			);
 		});
 		it("should support multiple unique constraints", () => {
@@ -250,7 +280,7 @@ describe("Model > Create Tables", () => {
 				}
 			);
 			expect(model.createTableDefinition).to.equal(
-				"CREATE TABLE `test` (id integer, name text, PRIMARY KEY (id), UNIQUE (id), UNIQUE (name));"
+				"CREATE TABLE `test` (id integer, name text, PRIMARY KEY (id), UNIQUE (id), UNIQUE (name)) WITHOUT ROWID;"
 			);
 		});
 		it("should support a unique constraint with multiple columns", () => {
@@ -267,7 +297,7 @@ describe("Model > Create Tables", () => {
 				}
 			);
 			expect(model.createTableDefinition).to.equal(
-				"CREATE TABLE `test` (id integer, name text, PRIMARY KEY (id), UNIQUE (id, name));"
+				"CREATE TABLE `test` (id integer, name text, PRIMARY KEY (id), UNIQUE (id, name)) WITHOUT ROWID;"
 			);
 		});
 	});
@@ -281,7 +311,7 @@ describe("Model > Create Tables", () => {
 				}
 			);
 			expect(model.createTableDefinition).to.equal(
-				"CREATE TABLE `test` (id integer, is_admin text DEFAULT 'test', PRIMARY KEY (id));"
+				"CREATE TABLE `test` (id integer, is_admin text DEFAULT 'test', PRIMARY KEY (id)) WITHOUT ROWID;"
 			);
 		});
 		it("should support a number", () => {
@@ -293,7 +323,7 @@ describe("Model > Create Tables", () => {
 				}
 			);
 			expect(model.createTableDefinition).to.equal(
-				"CREATE TABLE `test` (id integer, is_admin integer DEFAULT 1, PRIMARY KEY (id));"
+				"CREATE TABLE `test` (id integer, is_admin integer DEFAULT 1, PRIMARY KEY (id)) WITHOUT ROWID;"
 			);
 		});
 		it("should support a boolean", () => {
@@ -305,7 +335,7 @@ describe("Model > Create Tables", () => {
 				}
 			);
 			expect(model.createTableDefinition).to.equal(
-				"CREATE TABLE `test` (id integer, is_admin boolean DEFAULT true, PRIMARY KEY (id));"
+				"CREATE TABLE `test` (id integer, is_admin boolean DEFAULT true, PRIMARY KEY (id)) WITHOUT ROWID;"
 			);
 		});
 	});
