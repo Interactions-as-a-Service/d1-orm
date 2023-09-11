@@ -1,5 +1,11 @@
 # d1-orm
 
+## 0.8.0
+
+### Minor Changes
+
+- [#69](https://github.com/Interactions-as-a-Service/d1-orm/pull/69) [`2d5cbef`](https://github.com/Interactions-as-a-Service/d1-orm/commit/2d5cbefc2e904f34781f670cc46f9765492c290e) Thanks [@helloimalastair](https://github.com/helloimalastair)! - Adds a `withRowId` option to the Model class, defaulting to false. When not set to `true`, the `Model.createTableDefinition` will now include a `WITHOUT ROWID` line, which can optimise the performance of a majority of tables.
+
 ## 0.7.2
 
 ### Patch Changes
