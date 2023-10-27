@@ -177,7 +177,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 		options: { strategy: "default" | "force" /* | alter */ } = {
 			strategy: "default",
 		}
-	): Promise<D1Result<unknown>> {
+	): Promise<D1ExecResult> {
 		const { strategy } = options;
 		// @ts-expect-error Alter is not yet implemented
 		if (strategy === "alter") {
@@ -193,7 +193,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 	/**
 	 * @param silent If true, will ignore the table not existing. If false, will throw an error if the table does not exist.
 	 */
-	public async DropTable(silent?: boolean): Promise<D1Result<unknown>> {
+	public async DropTable(silent?: boolean): Promise<D1ExecResult> {
 		if (silent) {
 			return this.D1Orm.exec(`DROP TABLE IF EXISTS ${this.tableName};`);
 		}

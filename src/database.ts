@@ -29,8 +29,8 @@ export class D1Orm implements D1Database {
 		return this.database.batch<T>(statements);
 	}
 
-	public async exec<T>(query: string): Promise<D1Result<T>> {
-		return this.database.exec<T>(query);
+	public async exec(query: string): Promise<D1ExecResult> {
+		return this.database.exec(query);
 	}
 }
 
