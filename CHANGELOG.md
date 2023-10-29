@@ -1,5 +1,11 @@
 # d1-orm
 
+## 0.9.0
+
+### Minor Changes
+
+- [#71](https://github.com/Interactions-as-a-Service/d1-orm/pull/71) [`5c168e9`](https://github.com/Interactions-as-a-Service/d1-orm/commit/5c168e91ab72e675435b38efd1a3aef988f92d9f) Thanks [@dtbuchholz](https://github.com/dtbuchholz)! - This introduces breaking changes by updating to the latest `@cloudflare/workers-types@^4.20231025.0`, including compatability changes for the D1Database `exec` API. Namely, the model methods `CreateTable` and `DropTable` now return a `D1ExecResult` instead of `D1Result`.
+
 ## 0.8.0
 
 ### Minor Changes
