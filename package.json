@@ -38,7 +38,8 @@
 		"prettify": "prettier . --write --ignore-unknown --end-of-line lf",
 		"prepublish": "tsc",
 		"serve": "npm run build:docs && wrangler pages dev docs",
-		"test": "tsc && mocha"
+		"test": "vitest run",
+		"test:watch": "vitest --watch"
 	},
 	"eslintConfig": {
 		"parser": "@typescript-eslint/parser",
@@ -112,20 +113,20 @@
 		],
 		"root": true
 	},
+	"dependencies": {
+		"vitest": "^0.34.6"
+	},
 	"devDependencies": {
-		"@changesets/changelog-github": "^0.4.7",
-		"@changesets/cli": "^2.25.0",
+		"@changesets/changelog-github": "^0.4.8",
+		"@changesets/cli": "^2.26.2",
 		"@cloudflare/workers-types": "^4.20231025.0",
-		"@types/mocha": "^10.0.0",
-		"@typescript-eslint/eslint-plugin": "^5.40.0",
-		"chai": "^4.3.10",
-		"eslint-plugin-import": "^2.26.0",
-		"eslint-plugin-unused-imports": "^2.0.0",
-		"mocha": "^10.1.0",
-		"prettier": "^2.7.1",
-		"prettier-plugin-packagejson": "^2.3.0",
-		"typedoc": "^0.23.16",
-		"typescript": "^4.8.4",
-		"wrangler": "^2.1.11"
+		"@typescript-eslint/eslint-plugin": "^6.11.0",
+		"eslint-plugin-import": "^2.29.0",
+		"eslint-plugin-unused-imports": "^3.0.0",
+		"prettier": "^3.1.0",
+		"prettier-plugin-packagejson": "^2.4.6",
+		"typedoc": "^0.25.3",
+		"typescript": "^5.2.2",
+		"wrangler": "^3.15.0"
 	}
 }

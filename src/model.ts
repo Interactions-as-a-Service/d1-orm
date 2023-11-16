@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-duplicate-enum-values */
 import { D1Orm, isDatabase } from "./database.js";
 import { QueryType, GenerateQuery } from "./queryBuilder.js";
 import type { GenerateQueryOptions } from "./queryBuilder.js";
@@ -25,7 +26,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 			uniqueKeys?: Extract<keyof T, string>[][];
 			withRowId?: boolean;
 		},
-		columns: T
+		columns: T,
 	) {
 		this.#D1Orm = options.D1Orm ?? null;
 		this.tableName = options.tableName;
@@ -51,13 +52,13 @@ export class Model<T extends Record<string, ModelColumn>> {
 			this.primaryKeys.find((x) => typeof x !== "string" || !x.length)
 		) {
 			throw new Error(
-				"Options.primaryKeys must be a string or an array of strings"
+				"Options.primaryKeys must be a string or an array of strings",
 			);
 		}
 
 		if (this.#withRowId && this.#autoIncrementColumn) {
 			throw new Error(
-				"Options.autoIncrement and Options.withRowId cannot both be set"
+				"Options.autoIncrement and Options.withRowId cannot both be set",
 			);
 		}
 
@@ -70,33 +71,33 @@ export class Model<T extends Record<string, ModelColumn>> {
 		}
 		if (this.primaryKeys.find((x) => !(x in columns))) {
 			throw new Error(
-				"Options.primaryKeys includes a column that does not exist"
+				"Options.primaryKeys includes a column that does not exist",
 			);
 		}
 		if (this.#autoIncrementColumn) {
 			if (typeof this.#autoIncrementColumn !== "string") {
 				throw new Error(
-					"Options.autoIncrement was provided, but was not a string"
+					"Options.autoIncrement was provided, but was not a string",
 				);
 			}
 			if (!this.primaryKeys.includes(this.#autoIncrementColumn)) {
 				throw new Error(
-					"Options.autoIncrement was provided, but was not a primary key"
+					"Options.autoIncrement was provided, but was not a primary key",
 				);
 			}
 			if (this.primaryKeys.length > 1) {
 				throw new Error(
-					"Options.autoIncrement was provided, but there are multiple primary keys"
+					"Options.autoIncrement was provided, but there are multiple primary keys",
 				);
 			}
 			if (!this.columns[this.#autoIncrementColumn]) {
 				throw new Error(
-					"Options.autoIncrement was provided, but is not a column"
+					"Options.autoIncrement was provided, but is not a column",
 				);
 			}
 			if (this.columns[this.#autoIncrementColumn].type !== DataTypes.INTEGER) {
 				throw new Error(
-					"Options.autoIncrement was provided, but is not an integer column"
+					"Options.autoIncrement was provided, but is not an integer column",
 				);
 			}
 		}
@@ -159,7 +160,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 			columnDefinition.push(`UNIQUE (${i.join(", ")})`);
 		}
 		return `CREATE TABLE \`${this.tableName}\` (${columnDefinition.join(
-			", "
+			", ",
 		)})${
 			this.#autoIncrementColumn || this.#withRowId ? "" : " WITHOUT ROWID"
 		};`;
@@ -176,7 +177,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 	public async CreateTable(
 		options: { strategy: "default" | "force" /* | alter */ } = {
 			strategy: "default",
-		}
+		},
 	): Promise<D1ExecResult> {
 		const { strategy } = options;
 		// @ts-expect-error Alter is not yet implemented
@@ -205,7 +206,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 	 */
 	public async InsertOne(
 		data: Partial<InferFromColumns<T>>,
-		orReplace = false
+		orReplace = false,
 	): Promise<D1Result<InferFromColumns<T>>> {
 		const qt = orReplace ? QueryType.INSERT_OR_REPLACE : QueryType.INSERT;
 		const statement = GenerateQuery(qt, this.tableName, { data });
@@ -219,7 +220,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 	 */
 	public async InsertMany(
 		data: Partial<InferFromColumns<T>>[],
-		orReplace = false
+		orReplace = false,
 	): Promise<D1Result<InferFromColumns<T>>[]> {
 		const qt = orReplace ? QueryType.INSERT_OR_REPLACE : QueryType.INSERT;
 		const stmts: D1PreparedStatement[] = [];
@@ -237,12 +238,12 @@ export class Model<T extends Record<string, ModelColumn>> {
 	 * @returns Returns the first row that matches the where clause, or null if no rows match.
 	 */
 	public async First(
-		options: Pick<GenerateQueryOptions<InferFromColumns<T>>, "where">
+		options: Pick<GenerateQueryOptions<InferFromColumns<T>>, "where">,
 	): Promise<InferFromColumns<T> | null> {
 		const statement = GenerateQuery(
 			QueryType.SELECT,
 			this.tableName,
-			Object.assign(options, { limit: 1 })
+			Object.assign(options, { limit: 1 }),
 		);
 		try {
 			return await this.D1Orm.prepare(statement.query)
@@ -264,7 +265,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 		options: Omit<
 			GenerateQueryOptions<InferFromColumns<T>>,
 			"data" | "upsertOnlyUpdateData"
-		>
+		>,
 	): Promise<D1Result<InferFromColumns<T>>> {
 		const statement = GenerateQuery(QueryType.SELECT, this.tableName, options);
 		return this.D1Orm.prepare(statement.query)
@@ -276,7 +277,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 	 * @param options The options for the query, see {@link GenerateQueryOptions}
 	 */
 	public async Delete(
-		options: Pick<GenerateQueryOptions<InferFromColumns<T>>, "where">
+		options: Pick<GenerateQueryOptions<InferFromColumns<T>>, "where">,
 	): Promise<D1Result<unknown>> {
 		const statement = GenerateQuery(QueryType.DELETE, this.tableName, options);
 		return this.D1Orm.prepare(statement.query)
@@ -289,7 +290,7 @@ export class Model<T extends Record<string, ModelColumn>> {
 	 * @throws Throws an error if the data clause is empty.
 	 */
 	public async Update(
-		options: Pick<GenerateQueryOptions<InferFromColumns<T>>, "where" | "data">
+		options: Pick<GenerateQueryOptions<InferFromColumns<T>>, "where" | "data">,
 	): Promise<D1Result<unknown>> {
 		const statement = GenerateQuery(QueryType.UPDATE, this.tableName, options);
 		return this.D1Orm.prepare(statement.query)
@@ -306,13 +307,13 @@ export class Model<T extends Record<string, ModelColumn>> {
 		options: Pick<
 			GenerateQueryOptions<InferFromColumns<T>>,
 			"where" | "data" | "upsertOnlyUpdateData"
-		>
+		>,
 	): Promise<D1Result<unknown>> {
 		const statement = GenerateQuery(
 			QueryType.UPSERT,
 			this.tableName,
 			options,
-			this.primaryKeys
+			this.primaryKeys,
 		);
 		return this.D1Orm.prepare(statement.query)
 			.bind(...statement.bindings)
@@ -356,14 +357,14 @@ export type InferFromColumn<T extends ModelColumn> =
 	T["type"] extends DataTypes.INTEGER
 		? number
 		: T["type"] extends DataTypes.REAL
-		? number
-		: T["type"] extends DataTypes.TEXT
-		? string
-		: T["type"] extends DataTypes.BLOB
-		? ArrayBuffer
-		: T["type"] extends DataTypes.BOOLEAN
-		? 1 | 0
-		: never;
+		  ? number
+		  : T["type"] extends DataTypes.TEXT
+		    ? string
+		    : T["type"] extends DataTypes.BLOB
+		      ? ArrayBuffer
+		      : T["type"] extends DataTypes.BOOLEAN
+		        ? 1 | 0
+		        : never;
 
 /**
  * This is a helper type that allows you to know the JS type of a Record of {@link ModelColumn}s.

@@ -1,11 +1,11 @@
-import { expect } from "chai";
-import { D1Orm } from "../lib/database.js";
+import { describe, expect, it } from "vitest";
+import { D1Orm } from "../src/database";
 
 describe("ORM Validation", () => {
 	it("should throw if the database does not have the required methods", () => {
 		expect(() => new D1Orm({})).to.throw(
 			Error,
-			"Invalid database, should contain prepare, dump, batch, and exec methods"
+			"Invalid database, should contain prepare, dump, batch, and exec methods",
 		);
 	});
 	it("should allow a valid database", () => {
@@ -16,7 +16,7 @@ describe("ORM Validation", () => {
 					dump: () => {},
 					batch: () => {},
 					exec: () => {},
-				})
+				}),
 		).to.not.throw();
 	});
 	describe("it should call the database methods", () => {
@@ -50,10 +50,12 @@ describe("ORM Validation", () => {
 			expect(hasCalled.dump).to.be.true;
 		});
 		it("should call batch", () => {
+			// @ts-expect-error invalid args
 			orm.batch();
 			expect(hasCalled.batch).to.be.true;
 		});
 		it("should call exec", () => {
+			// @ts-expect-error invalid args
 			orm.exec();
 			expect(hasCalled.exec).to.be.true;
 		});
