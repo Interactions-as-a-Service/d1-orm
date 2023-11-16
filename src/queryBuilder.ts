@@ -61,7 +61,7 @@ export function GenerateQuery<T extends object>(
 	type: QueryType,
 	tableName: string,
 	options: GenerateQueryOptions<T> = {},
-	primaryKeys: string | string[] = "id"
+	primaryKeys: string | string[] = "id",
 ): { bindings: unknown[]; query: string } {
 	if (typeof tableName !== "string" || !tableName.length) {
 		throw new Error("Invalid table name");
@@ -153,7 +153,7 @@ export function GenerateQuery<T extends object>(
 			bindings.push(
 				...Object.values(options.data ?? {}),
 				...Object.values(options.upsertOnlyUpdateData ?? {}),
-				...Object.values(options.where ?? {})
+				...Object.values(options.where ?? {}),
 			);
 
 			if (
@@ -162,7 +162,7 @@ export function GenerateQuery<T extends object>(
 				whereKeys.length === 0
 			) {
 				throw new Error(
-					"Must provide data to insert with, data to update with, and where keys in Upsert"
+					"Must provide data to insert with, data to update with, and where keys in Upsert",
 				);
 			}
 			query = `INSERT INTO \`${tableName}\` (${insertDataKeys.join(", ")})`;
@@ -193,7 +193,7 @@ export function GenerateQuery<T extends object>(
  * @hidden
  */
 export function transformOrderBy<T extends object>(
-	orderBy: OrderBy<T> | OrderBy<T>[]
+	orderBy: OrderBy<T> | OrderBy<T>[],
 ): string {
 	if (Array.isArray(orderBy)) {
 		return orderBy.map(transformOrderBy).join(", ");

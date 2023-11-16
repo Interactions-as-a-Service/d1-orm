@@ -92,7 +92,7 @@
   	{
   		name: DataTypes.STRING,
   		age: DataTypes.NUMBER,
-  	}
+  	},
   );
 
   type User = Infer<typeof users>;

@@ -1,6 +1,6 @@
-import { expect } from "chai";
-import { D1Orm } from "../lib/database.js";
-import { Model, DataTypes } from "../lib/model.js";
+import { describe, expect, it } from "vitest";
+import { D1Orm } from "../src/database";
+import { Model, DataTypes } from "../src/model";
 
 const fakeD1Database = {
 	prepare: () => {},
@@ -13,15 +13,17 @@ describe("Model Validation", () => {
 	const orm = new D1Orm(fakeD1Database);
 	describe("it should throw if the model has invalid options", () => {
 		it("should throw if an invalid D1Orm is provided", () => {
+			// @ts-expect-error invalid args
 			expect(() => new Model({ D1Orm: {} })).to.throw(
 				Error,
-				"Options.D1Orm is not an instance of D1Orm"
+				"Options.D1Orm is not an instance of D1Orm",
 			);
 		});
 		it("should throw if an invalid tableName is provided", () => {
+			// @ts-expect-error invalid args
 			expect(() => new Model({ D1Orm: orm, tableName: 1 })).to.throw(
 				Error,
-				"Options.tableName must be a string"
+				"Options.tableName must be a string",
 			);
 		});
 		it("should throw if autoincrement and withRowId are both set", () => {
@@ -35,38 +37,41 @@ describe("Model Validation", () => {
 							autoIncrement: "id",
 							withRowId: true,
 						},
-						{ id: { type: DataTypes.INTEGER } }
-					)
+						{ id: { type: DataTypes.INTEGER } },
+					),
 			).to.throw(
 				Error,
-				"Options.autoIncrement and Options.withRowId cannot both be set"
+				"Options.autoIncrement and Options.withRowId cannot both be set",
 			);
 		});
 		describe("Primary keys", () => {
 			it("should throw an error if no primary keys are provided", () => {
+				// @ts-expect-error invalid args
 				expect(() => new Model({ D1Orm: orm, tableName: "users" })).to.throw(
 					Error,
-					"Options.primaryKeys must be a string or an array of strings"
+					"Options.primaryKeys must be a string or an array of strings",
 				);
 			});
 			it("should throw an error if the primary keys are not strings", () => {
 				expect(
-					() => new Model({ D1Orm: orm, tableName: "users", primaryKeys: [1] })
+					// @ts-expect-error invalid args
+					() => new Model({ D1Orm: orm, tableName: "users", primaryKeys: [1] }),
 				).to.throw(
 					Error,
-					"Options.primaryKeys must be a string or an array of strings"
+					"Options.primaryKeys must be a string or an array of strings",
 				);
 			});
 			it("should throw an error if a primary key is not a column", () => {
 				expect(
 					() =>
 						new Model(
+							// @ts-expect-error invalid args
 							{ D1Orm: orm, tableName: "users", primaryKeys: ["users"] },
-							{ id: { type: DataTypes.INTEGER } }
-						)
+							{ id: { type: DataTypes.INTEGER } },
+						),
 				).to.throw(
 					Error,
-					"Options.primaryKeys includes a column that does not exist"
+					"Options.primaryKeys includes a column that does not exist",
 				);
 			});
 		});
@@ -79,13 +84,14 @@ describe("Model Validation", () => {
 								D1Orm: orm,
 								tableName: "users",
 								primaryKeys: "id",
+								// @ts-expect-error invalid args
 								autoIncrement: 1,
 							},
-							{ id: { type: DataTypes.INTEGER } }
-						)
+							{ id: { type: DataTypes.INTEGER } },
+						),
 				).to.throw(
 					Error,
-					"Options.autoIncrement was provided, but was not a string"
+					"Options.autoIncrement was provided, but was not a string",
 				);
 			});
 			it("should throw an error if the autoIncrement is not a primary key", () => {
@@ -96,13 +102,14 @@ describe("Model Validation", () => {
 								D1Orm: orm,
 								tableName: "users",
 								primaryKeys: "id",
+								// @ts-expect-error invalid args
 								autoIncrement: "notId",
 							},
-							{ id: { type: DataTypes.INTEGER } }
-						)
+							{ id: { type: DataTypes.INTEGER } },
+						),
 				).to.throw(
 					Error,
-					"Options.autoIncrement was provided, but was not a primary key"
+					"Options.autoIncrement was provided, but was not a primary key",
 				);
 			});
 			it("should throw an error if autoIncrement is used with more than one primary key", () => {
@@ -118,11 +125,11 @@ describe("Model Validation", () => {
 							{
 								id: { type: DataTypes.INTEGER },
 								id2: { type: DataTypes.INTEGER },
-							}
-						)
+							},
+						),
 				).to.throw(
 					Error,
-					"Options.autoIncrement was provided, but there are multiple primary keys"
+					"Options.autoIncrement was provided, but there are multiple primary keys",
 				);
 			});
 			it("should throw an error if autoIncrement column is not an integer", () => {
@@ -139,11 +146,11 @@ describe("Model Validation", () => {
 								id: {
 									type: DataTypes.STRING,
 								},
-							}
-						)
+							},
+						),
 				).to.throw(
 					Error,
-					"Options.autoIncrement was provided, but is not an integer column"
+					"Options.autoIncrement was provided, but is not an integer column",
 				);
 			});
 		});
@@ -152,8 +159,8 @@ describe("Model Validation", () => {
 				() =>
 					new Model(
 						{ tableName: "users", primaryKeys: "id" },
-						{ id: { type: DataTypes.INTEGER } }
-					)
+						{ id: { type: DataTypes.INTEGER } },
+					),
 			).to.not.throw();
 		});
 	});
@@ -162,22 +169,23 @@ describe("Model Validation", () => {
 			expect(() =>
 				new Model(
 					{ tableName: "users", primaryKeys: "id" },
-					{ id: { type: DataTypes.INTEGER } }
-				).SetOrm({})
+					{ id: { type: DataTypes.INTEGER } },
+					// @ts-expect-error invalid args
+				).SetOrm({}),
 			).to.throw(Error, "Options.D1Orm is not an instance of D1Orm");
 		});
 		it("should accept an instance of D1Orm", () => {
 			expect(() =>
 				new Model(
 					{ tableName: "users", primaryKeys: "id" },
-					{ id: { type: DataTypes.INTEGER } }
-				).SetOrm(orm)
+					{ id: { type: DataTypes.INTEGER } },
+				).SetOrm(orm),
 			).to.not.throw();
 		});
 		it("should stop the getter from erroring", () => {
 			const model = new Model(
 				{ tableName: "users", primaryKeys: "id" },
-				{ id: { type: DataTypes.INTEGER } }
+				{ id: { type: DataTypes.INTEGER } },
 			);
 			expect(() => model.D1Orm).to.throw();
 			model.SetOrm(orm);
@@ -194,10 +202,10 @@ describe("Model > Create Tables", () => {
 			{
 				id: { type: DataTypes.INTEGER },
 				name: { type: DataTypes.STRING },
-			}
+			},
 		);
 		expect(model.createTableDefinition).to.equal(
-			"CREATE TABLE `test` (id integer PRIMARY KEY AUTOINCREMENT, name text);"
+			"CREATE TABLE `test` (id integer PRIMARY KEY AUTOINCREMENT, name text);",
 		);
 	});
 	it("should return a create table statement with multiple primary keys", () => {
@@ -206,10 +214,10 @@ describe("Model > Create Tables", () => {
 			{
 				id: { type: DataTypes.INTEGER },
 				name: { type: DataTypes.STRING },
-			}
+			},
 		);
 		expect(model.createTableDefinition).to.equal(
-			"CREATE TABLE `test` (id integer, name text, PRIMARY KEY (id, name)) WITHOUT ROWID;"
+			"CREATE TABLE `test` (id integer, name text, PRIMARY KEY (id, name)) WITHOUT ROWID;",
 		);
 	});
 	it("should support a not null constraint", () => {
@@ -218,10 +226,10 @@ describe("Model > Create Tables", () => {
 			{
 				id: { type: DataTypes.INTEGER },
 				name: { type: DataTypes.STRING, notNull: true },
-			}
+			},
 		);
 		expect(model.createTableDefinition).to.equal(
-			"CREATE TABLE `test` (id integer, name text NOT NULL, PRIMARY KEY (id)) WITHOUT ROWID;"
+			"CREATE TABLE `test` (id integer, name text NOT NULL, PRIMARY KEY (id)) WITHOUT ROWID;",
 		);
 	});
 	it("should support a valid autoIncrement constraint", () => {
@@ -230,10 +238,10 @@ describe("Model > Create Tables", () => {
 			{
 				id: { type: DataTypes.INTEGER },
 				name: { type: DataTypes.STRING },
-			}
+			},
 		);
 		expect(model.createTableDefinition).to.equal(
-			"CREATE TABLE `test` (id integer PRIMARY KEY AUTOINCREMENT, name text);"
+			"CREATE TABLE `test` (id integer PRIMARY KEY AUTOINCREMENT, name text);",
 		);
 	});
 	it("should not include WITHOUT ROWID", () => {
@@ -242,10 +250,10 @@ describe("Model > Create Tables", () => {
 			{
 				id: { type: DataTypes.INTEGER },
 				is_admin: { type: DataTypes.STRING },
-			}
+			},
 		);
 		expect(model.createTableDefinition).to.equal(
-			"CREATE TABLE `test` (id integer, is_admin text, PRIMARY KEY (id));"
+			"CREATE TABLE `test` (id integer, is_admin text, PRIMARY KEY (id));",
 		);
 	});
 	describe("Unique Constraints", () => {
@@ -260,10 +268,10 @@ describe("Model > Create Tables", () => {
 				{
 					id: { type: DataTypes.INTEGER, primaryKey: true },
 					name: { type: DataTypes.STRING },
-				}
+				},
 			);
 			expect(model.createTableDefinition).to.equal(
-				"CREATE TABLE `test` (id integer, name text, PRIMARY KEY (id), UNIQUE (id)) WITHOUT ROWID;"
+				"CREATE TABLE `test` (id integer, name text, PRIMARY KEY (id), UNIQUE (id)) WITHOUT ROWID;",
 			);
 		});
 		it("should support multiple unique constraints", () => {
@@ -277,10 +285,10 @@ describe("Model > Create Tables", () => {
 				{
 					id: { type: DataTypes.INTEGER, primaryKey: true },
 					name: { type: DataTypes.STRING },
-				}
+				},
 			);
 			expect(model.createTableDefinition).to.equal(
-				"CREATE TABLE `test` (id integer, name text, PRIMARY KEY (id), UNIQUE (id), UNIQUE (name)) WITHOUT ROWID;"
+				"CREATE TABLE `test` (id integer, name text, PRIMARY KEY (id), UNIQUE (id), UNIQUE (name)) WITHOUT ROWID;",
 			);
 		});
 		it("should support a unique constraint with multiple columns", () => {
@@ -294,10 +302,10 @@ describe("Model > Create Tables", () => {
 				{
 					id: { type: DataTypes.INTEGER, primaryKey: true },
 					name: { type: DataTypes.STRING },
-				}
+				},
 			);
 			expect(model.createTableDefinition).to.equal(
-				"CREATE TABLE `test` (id integer, name text, PRIMARY KEY (id), UNIQUE (id, name)) WITHOUT ROWID;"
+				"CREATE TABLE `test` (id integer, name text, PRIMARY KEY (id), UNIQUE (id, name)) WITHOUT ROWID;",
 			);
 		});
 	});
@@ -308,10 +316,10 @@ describe("Model > Create Tables", () => {
 				{
 					id: { type: DataTypes.INTEGER },
 					is_admin: { type: DataTypes.STRING, defaultValue: "test" },
-				}
+				},
 			);
 			expect(model.createTableDefinition).to.equal(
-				"CREATE TABLE `test` (id integer, is_admin text DEFAULT 'test', PRIMARY KEY (id)) WITHOUT ROWID;"
+				"CREATE TABLE `test` (id integer, is_admin text DEFAULT 'test', PRIMARY KEY (id)) WITHOUT ROWID;",
 			);
 		});
 		it("should support a number", () => {
@@ -320,10 +328,10 @@ describe("Model > Create Tables", () => {
 				{
 					id: { type: DataTypes.INTEGER },
 					is_admin: { type: DataTypes.INTEGER, defaultValue: 1 },
-				}
+				},
 			);
 			expect(model.createTableDefinition).to.equal(
-				"CREATE TABLE `test` (id integer, is_admin integer DEFAULT 1, PRIMARY KEY (id)) WITHOUT ROWID;"
+				"CREATE TABLE `test` (id integer, is_admin integer DEFAULT 1, PRIMARY KEY (id)) WITHOUT ROWID;",
 			);
 		});
 		it("should support a boolean", () => {
@@ -332,10 +340,10 @@ describe("Model > Create Tables", () => {
 				{
 					id: { type: DataTypes.INTEGER },
 					is_admin: { type: DataTypes.BOOLEAN, defaultValue: true },
-				}
+				},
 			);
 			expect(model.createTableDefinition).to.equal(
-				"CREATE TABLE `test` (id integer, is_admin boolean DEFAULT true, PRIMARY KEY (id)) WITHOUT ROWID;"
+				"CREATE TABLE `test` (id integer, is_admin boolean DEFAULT true, PRIMARY KEY (id)) WITHOUT ROWID;",
 			);
 		});
 	});

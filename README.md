@@ -51,7 +51,7 @@ export default {
 				email: {
 					type: DataTypes.STRING,
 				},
-			}
+			},
 		);
 		type User = Infer<typeof users>;
 
