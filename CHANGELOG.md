@@ -1,5 +1,13 @@
 # d1-orm
 
+## 0.9.1
+
+### Patch Changes
+
+- [#78](https://github.com/Interactions-as-a-Service/d1-orm/pull/78) [`9a49134`](https://github.com/Interactions-as-a-Service/d1-orm/commit/9a49134882a5321f836448a378fcaf162c29b290) Thanks [@Skye-31](https://github.com/Skye-31)! - Fix(deps): move vitest to dev dependency
+
+  Vitest was accidentally installed as a dependency, rather than a devDependency. Closes #77
+
 ## 0.9.0
 
 ### Minor Changes
