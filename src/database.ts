@@ -3,6 +3,12 @@
  *
  * It's methods generally don't need to be called directly, but are instead to be used by the models.
  */
+import type {
+	D1Database,
+	D1ExecResult,
+	D1PreparedStatement,
+	D1Result,
+} from "@cloudflare/workers-types";
 export class D1Orm implements D1Database {
 	constructor(database: D1Database) {
 		if (!isDatabase(database)) {

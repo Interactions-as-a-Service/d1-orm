@@ -2,6 +2,11 @@
 import { D1Orm, isDatabase } from "./database.js";
 import { QueryType, GenerateQuery } from "./queryBuilder.js";
 import type { GenerateQueryOptions } from "./queryBuilder.js";
+import type {
+	D1ExecResult,
+	D1PreparedStatement,
+	D1Result,
+} from "@cloudflare/workers-types";
 
 /**
  * @typeParam T - The type of the model, which will be returned when using methods such as First() or All()
