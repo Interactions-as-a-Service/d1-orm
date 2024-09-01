@@ -1,6 +1,6 @@
 # D1-Orm
 
-✨ A simple, strictly typed ORM, to assist you in using [Cloudflare's D1 product](https://blog.cloudflare.com/introducing-d1/)
+✨ A simple, strictly typed ORM, to assist you in using [Cloudflare's SQLite Database](https://developers.cloudflare.com/d1)
 
 Docs can be found at https://docs.interactions.rest/d1-orm/
 
@@ -16,7 +16,7 @@ npm install d1-orm
 
 ## Usage
 
-This package is recommended to be used with [@cloudflare/workers-types](https://github.com/cloudflare/workers-types) 3.16.0+.
+This package is recommended to be used with [@cloudflare/workers-types](https://github.com/cloudflare/workers-types) 4+.
 
 ```ts
 import { D1Orm, DataTypes, Model } from "d1-orm";
@@ -64,5 +64,3 @@ export default {
 	},
 };
 ```
-
-For more information, refer to the [docs](https://docs.interactions.rest/d1-orm).
