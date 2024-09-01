@@ -357,14 +357,14 @@ export type InferFromColumn<T extends ModelColumn> =
 	T["type"] extends DataTypes.INTEGER
 		? number
 		: T["type"] extends DataTypes.REAL
-		  ? number
-		  : T["type"] extends DataTypes.TEXT
-		    ? string
-		    : T["type"] extends DataTypes.BLOB
-		      ? ArrayBuffer
-		      : T["type"] extends DataTypes.BOOLEAN
-		        ? 1 | 0
-		        : never;
+			? number
+			: T["type"] extends DataTypes.TEXT
+				? string
+				: T["type"] extends DataTypes.BLOB
+					? ArrayBuffer
+					: T["type"] extends DataTypes.BOOLEAN
+						? 1 | 0
+						: never;
 
 /**
  * This is a helper type that allows you to know the JS type of a Record of {@link ModelColumn}s.

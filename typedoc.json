@@ -7,9 +7,9 @@
 	"excludePrivate": true,
 	"externalSymbolLinkMappings": {
 		"@cloudflare/workers-types": {
-			"D1Result": "https://github.com/cloudflare/workers-types/blob/master/overrides/d1.d.ts",
-			"D1Database": "https://github.com/cloudflare/workers-types/blob/master/overrides/d1.d.ts",
-			"D1PreparedStatement": "https://github.com/cloudflare/workers-types/blob/master/overrides/d1.d.ts"
+			"D1Result": "https://workers-types.pages.dev/#D1Result",
+			"D1Database": "https://workers-types.pages.dev/#D1Database",
+			"D1PreparedStatement": "https://workers-types.pages.dev/#D1PreparedStatement"
 		},
 		"typescript": {
 			"Promise": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise",
