@@ -15,10 +15,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Use Node.js 16.17
+      - name: Use Node.js 20
         uses: actions/setup-node@v3
         with:
-          node-version: 16.17
+          node-version: 20
           cache: "npm" # cache ~/.npm in case 'npm ci' needs to run
 
       - name: Install NPM Dependencies
@@ -39,10 +39,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Use Node.js 16.17
+      - name: Use Node.js 20
         uses: actions/setup-node@v3
         with:
-          node-version: 16.17
+          node-version: 20
           cache: "npm" # cache ~/.npm in case 'npm ci' needs to run
 
       - name: Install NPM Dependencies
@@ -60,10 +60,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Use Node.js 16.17
+      - name: Use Node.js 20
         uses: actions/setup-node@v3
         with:
-          node-version: 16.17
+          node-version: 20
           cache: "npm" # cache ~/.npm in case 'npm ci' needs to run
 
       - name: Install NPM Dependencies
