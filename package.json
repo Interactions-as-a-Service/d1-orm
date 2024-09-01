@@ -24,8 +24,7 @@
 	"type": "module",
 	"main": "lib/index.js",
 	"files": [
-		"lib",
-		"src"
+		"lib"
 	],
 	"scripts": {
 		"build": "tsc",
@@ -34,8 +33,8 @@
 		"check:format": "prettier . --check --ignore-unknown --end-of-line lf",
 		"check:lint": "eslint src/*.ts --cache --cache-strategy content --max-warnings=0",
 		"docs:watch": "typedoc --watch",
+		"format": "prettier . --write --ignore-unknown --end-of-line lf",
 		"lint:fix": "eslint src/*.ts --fix",
-		"prettify": "prettier . --write --ignore-unknown --end-of-line lf",
 		"prepublish": "tsc",
 		"serve": "npm run build:docs && wrangler pages dev docs",
 		"test": "vitest run",
