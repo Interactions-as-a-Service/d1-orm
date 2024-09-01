@@ -27,7 +27,7 @@
 		"lib"
 	],
 	"scripts": {
-		"build": "tsc",
+		"build": "tsc && esbuild --bundle --minify --target=es2022 src/index.ts --outfile=lib/index.js",
 		"build:docs": "typedoc",
 		"changeset": "changeset",
 		"check:format": "prettier . --check --ignore-unknown --end-of-line lf",
@@ -35,7 +35,7 @@
 		"docs:watch": "typedoc --watch",
 		"format": "prettier . --write --ignore-unknown --end-of-line lf",
 		"lint:fix": "eslint src/*.ts --fix",
-		"prepublish": "tsc",
+		"prepublishOnly": "npm run build",
 		"serve": "npm run build:docs && wrangler pages dev docs",
 		"test": "vitest run",
 		"test:watch": "vitest --watch"
@@ -117,6 +117,7 @@
 		"@changesets/cli": "^2.26.2",
 		"@cloudflare/workers-types": "^4.20231025.0",
 		"@typescript-eslint/eslint-plugin": "^6.11.0",
+		"esbuild": "^0.23.1",
 		"eslint-plugin-import": "^2.29.0",
 		"eslint-plugin-unused-imports": "^3.0.0",
 		"prettier": "^3.1.0",
