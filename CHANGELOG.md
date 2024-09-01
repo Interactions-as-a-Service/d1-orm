@@ -1,5 +1,11 @@
 # d1-orm
 
+## 0.9.2
+
+### Patch Changes
+
+- [#81](https://github.com/Interactions-as-a-Service/d1-orm/pull/81) [`73e0dab`](https://github.com/Interactions-as-a-Service/d1-orm/commit/73e0dabcc8e1be0742502c5ce413187098ea5406) Thanks [@Skye-31](https://github.com/Skye-31)! - Fix: Don't publish the `src` directory in the package
+
 ## 0.9.1
 
 ### Patch Changes
